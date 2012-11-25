@@ -664,7 +664,26 @@ class Mage_Core_Model_Config extends Mage_Core_Model_Config_Base
                 }
             }
         }
-        return  parent::getNode($path);
+
+        $res = parent::getNode($path);
+
+        if (!empty($path) && !$res) {
+            $parts = is_array($path) ? $path : explode('/', $path);
+            if ($parts[0] == 'stores') {
+                // fallback to website level
+                $websiteScopeCode = Mage::app()->getStore($parts[1])->getWebsite()->getCode();
+                $parts[0] = 'websites';
+                $parts[1] = $websiteScopeCode;
+                $res = $this->getNode(implode('/', $parts));
+            } elseif ($parts[0] == 'websites') {
+                // fallback to default level
+                $parts[1] = 'default';
+                array_shift($parts);
+                $res = $this->getNode(implode('/', $parts));
+            }
+        }
+
+        return $res;
     }
 
     /**

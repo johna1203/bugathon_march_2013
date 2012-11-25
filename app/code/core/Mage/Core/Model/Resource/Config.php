@@ -108,6 +108,9 @@ class Mage_Core_Model_Resource_Config extends Mage_Core_Model_Resource_Db_Abstra
         // inherit default config values to all websites
         $extendSource = $xmlConfig->getNode('default');
         foreach ($websites as $id=>$w) {
+            if ($id != 0) {
+                continue;
+            }
             $websiteNode = $xmlConfig->getNode('websites/' . $w['code']);
             $websiteNode->extend($extendSource);
         }
@@ -129,9 +132,15 @@ class Mage_Core_Model_Resource_Config extends Mage_Core_Model_Resource_Db_Abstra
 
         // extend website config values to all associated stores
         foreach ($websites as $website) {
+            if ($website['code'] != 'admin') {
+                continue;
+            }
             $extendSource = $xmlConfig->getNode('websites/' . $website['code']);
             if (isset($website['stores'])) {
                 foreach ($website['stores'] as $sCode) {
+                    if ($sCode != 'admin') {
+                        continue;
+                    }
                     $storeNode = $xmlConfig->getNode('stores/'.$sCode);
                     /**
                      * $extendSource DO NOT need overwrite source
