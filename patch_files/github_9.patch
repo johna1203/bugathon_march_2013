@@ -1,0 +1,15 @@
+Index: magento_saas_merge/app/code/core/Mage/Core/Model/Email/Template.php
+===================================================================
+--- magento_saas_merge/app/code/core/Mage/Core/Model/Email/Template.php	(revision 32b3b9e)
++++ magento_saas_merge/app/code/core/Mage/Core/Model/Email/Template.php	(revision 294266ae0ea36957a40d0d4e2695b6481658a9f8)
+@@ -328,6 +328,10 @@
+ 
+         if (isset($variables['subscriber']) && ($variables['subscriber'] instanceof Mage_Newsletter_Model_Subscriber)) {
+             $processor->setStoreId($variables['subscriber']->getStoreId());
++            $this->setDesignConfig(array(
++                'store' => $variables['subscriber']->getStoreId(),
++                'area' => Mage_Core_Model_App_Area::AREA_FRONTEND
++            ));
+         }
+ 
+         if (!isset($variables['logo_url'])) {
