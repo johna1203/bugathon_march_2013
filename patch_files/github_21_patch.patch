@@ -1,0 +1,296 @@
+diff --git app/code/core/Mage/Bundle/Block/Catalog/Product/View/Type/Bundle.php app/code/core/Mage/Bundle/Block/Catalog/Product/View/Type/Bundle.php
+index 4324218..373dca1 100644
+--- app/code/core/Mage/Bundle/Block/Catalog/Product/View/Type/Bundle.php
++++ app/code/core/Mage/Bundle/Block/Catalog/Product/View/Type/Bundle.php
+@@ -101,6 +101,9 @@ class Mage_Bundle_Block_Catalog_Product_View_Type_Bundle extends Mage_Catalog_Bl
+ 
+             $selectionCount = count($_option->getSelections());
+ 
++            /* @var $taxHelper Mage_Tax_Helper_Data */
++            $taxHelper = Mage::helper('tax');
++
+             foreach ($_option->getSelections() as $_selection) {
+                 $selectionId = $_selection->getSelectionId();
+                 $_qty = !($_selection->getSelectionQty()*1) ? '1' : $_selection->getSelectionQty()*1;
+@@ -108,6 +111,8 @@ class Mage_Bundle_Block_Catalog_Product_View_Type_Bundle extends Mage_Catalog_Bl
+                 $tierPrices = $_selection->getTierPrice();
+                 foreach ($tierPrices as &$tierPriceInfo) {
+                     $tierPriceInfo['price'] = $coreHelper->currency($tierPriceInfo['price'], false, false);
++                    $tierPriceInfo['priceInclTax'] = $taxHelper->getPrice($_selection, $tierPriceInfo['price'], true);
++                    $tierPriceInfo['priceExclTax'] = $taxHelper->getPrice($_selection, $tierPriceInfo['price']);
+                 }
+                 unset($tierPriceInfo); // break the reference with the last element
+ 
+@@ -131,9 +136,6 @@ class Mage_Bundle_Block_Catalog_Product_View_Type_Bundle extends Mage_Catalog_Bl
+ 
+                 $canApplyMAP = false;
+ 
+-                /* @var $taxHelper Mage_Tax_Helper_Data */
+-                $taxHelper = Mage::helper('tax');
+-
+                 $_priceInclTax = $taxHelper->getPrice($_selection, $itemPrice, true);
+                 $_priceExclTax = $taxHelper->getPrice($_selection, $itemPrice);
+ 
+@@ -151,6 +153,7 @@ class Mage_Bundle_Block_Catalog_Product_View_Type_Bundle extends Mage_Catalog_Bl
+                     'priceValue' => $coreHelper->currency($_selection->getSelectionPriceValue(), false, false),
+                     'priceType' => $_selection->getSelectionPriceType(),
+                     'tierPrice' => $tierPrices,
++                    'tierPriceHtml' => $this->getTierPriceHtml($_selection),
+                     'name'      => $_selection->getName(),
+                     'plusDisposition' => 0,
+                     'minusDisposition' => 0,
+diff --git app/code/core/Mage/Bundle/Block/Catalog/Product/View/Type/Bundle/Option.php app/code/core/Mage/Bundle/Block/Catalog/Product/View/Type/Bundle/Option.php
+index 12ffe61..78aafe5 100644
+--- app/code/core/Mage/Bundle/Block/Catalog/Product/View/Type/Bundle/Option.php
++++ app/code/core/Mage/Bundle/Block/Catalog/Product/View/Type/Bundle/Option.php
+@@ -174,6 +174,11 @@ class Mage_Bundle_Block_Catalog_Product_View_Type_Bundle_Option extends Mage_Bun
+     public function getSelectionQtyTitlePrice($_selection, $includeContainer = true)
+     {
+         $price = $this->getProduct()->getPriceModel()->getSelectionPreFinalPrice($this->getProduct(), $_selection);
++        $tierPrice = $_selection->getTierPrice();
++        if (!empty($tierPrice)) {
++            $qty = $_selection->getSelectionQty();
++            $price = $qty * (float) $_selection->getPriceModel()->getTierPrice($qty, $_selection);
++        }
+         $this->setFormatProduct($_selection);
+         $priceTitle = $_selection->getSelectionQty()*1 . ' x ' . $_selection->getName();
+ 
+@@ -206,13 +211,38 @@ class Mage_Bundle_Block_Catalog_Product_View_Type_Bundle_Option extends Mage_Bun
+     /**
+      * Get title price for selection product
+      *
++     * @deprecated
++     *
+      * @param Mage_Catalog_Model_Product $_selection
+      * @param bool $includeContainer
+      * @return string
+      */
+     public function getSelectionTitlePrice($_selection, $includeContainer = true)
+     {
++        return $this->getSelectionTitleTierPrice($_selection, $includeContainer);
++    }
++
++    /**
++     * Get title price for selection product
++     * considering selection's tier prices for predefined qty if applyTierPrice flag is set
++     *
++     * @param Mage_Catalog_Model_Product $_selection
++     * @param bool $includeContainer
++     * @param bool $applyTierPrice
++     * @return string
++     */
++    public function getSelectionTitleTierPrice($_selection, $includeContainer = true, $applyTierPrice = false)
++    {
+         $price = $this->getProduct()->getPriceModel()->getSelectionPreFinalPrice($this->getProduct(), $_selection, 1);
++
++        if ($applyTierPrice) {
++            $tierPrice = $_selection->getTierPrice();
++            if (!empty($tierPrice)) {
++                $price = (float) $_selection->getPriceModel()
++                    ->getTierPrice($_selection->getSelectionQty(), $_selection);
++            }
++        }
++
+         $this->setFormatProduct($_selection);
+         $priceTitle = $_selection->getName();
+         $priceTitle .= ' &nbsp; ' . ($includeContainer ? '<span class="price-notice">' : '')
+diff --git app/code/core/Mage/Catalog/Block/Product/Price.php app/code/core/Mage/Catalog/Block/Product/Price.php
+index 8e359ab..4dae111 100644
+--- app/code/core/Mage/Catalog/Block/Product/Price.php
++++ app/code/core/Mage/Catalog/Block/Product/Price.php
+@@ -31,7 +31,7 @@
+  * @category   Mage
+  * @package    Mage_Catalog
+  */
+-class Mage_Catalog_Block_Product_Price extends Mage_Core_Block_Template
++class Mage_Catalog_Block_Product_Price extends Mage_Catalog_Block_Product_Abstract
+ {
+     protected $_priceDisplayType = null;
+     protected $_idSuffix = '';
+@@ -62,64 +62,6 @@ class Mage_Catalog_Block_Product_Price extends Mage_Core_Block_Template
+     }
+ 
+     /**
+-     * Get tier prices (formatted)
+-     *
+-     * @param Mage_Catalog_Model_Product $product
+-     * @return array
+-     */
+-    public function getTierPrices($product = null)
+-    {
+-        if (is_null($product)) {
+-            $product = $this->getProduct();
+-        }
+-        $prices  = $product->getFormatedTierPrice();
+-
+-        $res = array();
+-        if (is_array($prices)) {
+-            foreach ($prices as $price) {
+-                $price['price_qty'] = $price['price_qty']*1;
+-
+-                if ($product->getPrice() != $product->getFinalPrice()) {
+-                    $productPrice = $product->getFinalPrice();
+-                } else {
+-                    $productPrice = $product->getPrice();
+-                }
+-
+-                if ($price['price']<$productPrice) {
+-                    $price['savePercent'] = ceil(100 - (( 100/$productPrice ) * $price['price'] ));
+-
+-                    $tierPrice = Mage::app()->getStore()->convertPrice(
+-                        Mage::helper('tax')->getPrice($product, $price['website_price'])
+-                    );
+-                    $price['formated_price'] = Mage::app()->getStore()->formatPrice($tierPrice);
+-                    $price['formated_price_incl_tax'] = Mage::app()->getStore()->formatPrice(
+-                        Mage::app()->getStore()->convertPrice(
+-                            Mage::helper('tax')->getPrice($product, $price['website_price'], true)
+-                        )
+-                    );
+-
+-                    if (Mage::helper('catalog')->canApplyMsrp($product)) {
+-                        $oldPrice = $product->getFinalPrice();
+-                        $product->setPriceCalculation(false);
+-                        $product->setPrice($tierPrice);
+-                        $product->setFinalPrice($tierPrice);
+-
+-                        $this->getLayout()->getBlock('product.info')->getPriceHtml($product);
+-                        $product->setPriceCalculation(true);
+-
+-                        $price['real_price_html'] = $product->getRealPriceHtml();
+-                        $product->setFinalPrice($oldPrice);
+-                    }
+-
+-                    $res[] = $price;
+-                }
+-            }
+-        }
+-
+-        return $res;
+-    }
+-
+-    /**
+      * Retrieve url for direct adding product to cart
+      *
+      * @param Mage_Catalog_Model_Product $product
+diff --git app/design/frontend/base/default/template/bundle/catalog/product/view/type/bundle/option/radio.phtml app/design/frontend/base/default/template/bundle/catalog/product/view/type/bundle/option/radio.phtml
+index 308b3b0..0828827 100644
+--- app/design/frontend/base/default/template/bundle/catalog/product/view/type/bundle/option/radio.phtml
++++ app/design/frontend/base/default/template/bundle/catalog/product/view/type/bundle/option/radio.phtml
+@@ -38,8 +38,12 @@
+ <dd<?php if ($_option->decoratedIsLast){?> class="last"<?php }?>>
+     <div class="input-box">
+     <?php if ($this->_showSingle()): ?>
+-        <?php echo $this->getSelectionTitlePrice($_selections[0]) ?>
+-        <input type="hidden" name="bundle_option[<?php echo $_option->getId() ?>]" value="<?php echo $_selections[0]->getSelectionId() ?>" />
++        <?php $_selection = $_selections[0]; ?>
++        <?php $_selectionCanChangeQty = $_selection->getSelectionCanChangeQty(); ?>
++        <?php $selectionTitlePrice = ($_selectionCanChangeQty) ? $this->getSelectionTitleTierPrice($_selection) : $this->getSelectionTitleTierPrice($_selection, true, true); ?>
++        <?php echo $selectionTitlePrice ?>
++        <?php echo ($_selectionCanChangeQty) ? $this->getTierPriceHtml($_selection) : '' ?>
++        <input type="hidden" name="bundle_option[<?php echo $_option->getId() ?>]" value="<?php echo $_selection->getSelectionId() ?>" />
+     <?php else:?>
+         <ul class="options-list">
+         <?php if (!$_option->getRequired()): ?>
+@@ -49,7 +53,10 @@
+         <?php endif; ?>
+         <?php foreach ($_selections as $_selection): ?>
+             <li><input type="radio" onclick="bundle.changeSelection(this)" class="radio<?php echo $_option->getRequired()?' validate-one-required-by-name':'' ?> change-container-classname" id="bundle-option-<?php echo $_option->getId() ?>-<?php echo $_selection->getSelectionId() ?>" name="bundle_option[<?php echo $_option->getId() ?>]"<?php if ($this->_isSelected($_selection)) echo ' checked="checked"' ?><?php if (!$_selection->isSaleable()) echo ' disabled="disabled"' ?>value="<?php echo $_selection->getSelectionId() ?>"/>
+-            <span class="label"><label for="bundle-option-<?php echo $_option->getId() ?>-<?php echo $_selection->getSelectionId() ?>"><?php echo $this->getSelectionTitlePrice($_selection) ?></label></span>
++            <?php $_selectionCanChangeQty = $_selection->getSelectionCanChangeQty(); ?>
++            <?php $selectionTitlePrice = ($_selectionCanChangeQty) ? $this->getSelectionTitleTierPrice($_selection) : $this->getSelectionTitleTierPrice($_selection, true, true); ?>
++            <span class="label"><label for="bundle-option-<?php echo $_option->getId() ?>-<?php echo $_selection->getSelectionId() ?>"><?php echo $selectionTitlePrice ?></label></span>
++            <?php echo ($_selectionCanChangeQty) ? $this->getTierPriceHtml($_selection) : '' ?>
+             <?php if ($_option->getRequired()): ?>
+                 <?php echo $this->setValidationContainer('bundle-option-'.$_option->getId().'-'.$_selection->getSelectionId(), 'bundle-option-'.$_option->getId().'-container') ?>
+             <?php endif; ?>
+diff --git app/design/frontend/base/default/template/bundle/catalog/product/view/type/bundle/option/select.phtml app/design/frontend/base/default/template/bundle/catalog/product/view/type/bundle/option/select.phtml
+index c0d92d4..5993f88 100644
+--- app/design/frontend/base/default/template/bundle/catalog/product/view/type/bundle/option/select.phtml
++++ app/design/frontend/base/default/template/bundle/catalog/product/view/type/bundle/option/select.phtml
+@@ -38,17 +38,27 @@
+ <dd<?php if ($_option->decoratedIsLast){?> class="last"<?php }?>>
+     <div class="input-box">
+     <?php if ($this->_showSingle()): ?>
+-        <?php echo $this->getSelectionTitlePrice($_selections[0]) ?>
++        <?php $_selection = $_selections[0]; ?>
++        <?php $_selectionCanChangeQty = $_selection->getSelectionCanChangeQty(); ?>
++        <?php $selectionTitlePrice = ($_selectionCanChangeQty) ? $this->getSelectionTitleTierPrice($_selection) : $this->getSelectionTitleTierPrice($_selection, true, true); ?>
++        <?php echo $selectionTitlePrice ?>
++        <?php echo ($_selectionCanChangeQty) ? $this->getTierPriceHtml($_selection) : '' ?>
+         <input type="hidden" name="bundle_option[<?php echo $_option->getId() ?>]" value="<?php echo $_selections[0]->getSelectionId() ?>"/>
+     <?php else:?>
+         <select onchange="bundle.changeSelection(this)" id="bundle-option-<?php echo $_option->getId() ?>" name="bundle_option[<?php echo $_option->getId() ?>]" class="bundle-option-<?php echo $_option->getId() ?><?php if ($_option->getRequired()) echo ' required-entry' ?> bundle-option-select change-container-classname">
+             <option value=""><?php echo $this->__('Choose a selection...') ?></option>
+         <?php foreach ($_selections as $_selection): ?>
+-            <option value="<?php echo $_selection->getSelectionId() ?>"<?php if ($this->_isSelected($_selection)) echo ' selected="selected"' ?><?php if (!$_selection->isSaleable()) echo ' disabled="disabled"' ?>><?php echo $this->getSelectionTitlePrice($_selection, false) ?></option>
++            <?php $_selectionCanChangeQty = $_selection->getSelectionCanChangeQty(); ?>
++            <?php $selectionTitlePrice = ($_selectionCanChangeQty) ? $this->getSelectionTitleTierPrice($_selection, false) : $this->getSelectionTitleTierPrice($_selection, false, true); ?>
++            <?php if ($_selectionCanChangeQty && $this->_isSelected($_selection)): ?>
++                <?php $tierPriceHtml = $this->getTierPriceHtml($_selection); ?>
++            <?php endif; ?>
++            <option value="<?php echo $_selection->getSelectionId() ?>"<?php if ($this->_isSelected($_selection)) echo ' selected="selected"' ?><?php if (!$_selection->isSaleable()) echo ' disabled="disabled"' ?>><?php echo $selectionTitlePrice ?></option>
+         <?php endforeach; ?>
+         </select>
+     <?php endif; ?>
+     </div>
++    <span id="bundle-option-<?php echo $_option->getId() ?>-tier-prices"><?php echo $tierPriceHtml ?></span>
+     <span class="qty-holder">
+         <label for="bundle-option-<?php echo $_option->getId() ?>-qty-input"><?php echo $this->__('Qty:') ?>&nbsp;</label><input onkeyup="bundle.changeOptionQty(this, event)" onblur="bundle.changeOptionQty(this, event)" <?php if (!$_canChangeQty) echo ' disabled="disabled"' ?> id="bundle-option-<?php echo $_option->getId() ?>-qty-input" class="input-text qty<?php if (!$_canChangeQty) echo ' qty-disabled' ?>" type="text" name="bundle_option_qty[<?php echo $_option->getId() ?>]" value="<?php echo $_defaultQty ?>"/>
+     </span>
+diff --git skin/frontend/base/default/js/bundle.js skin/frontend/base/default/js/bundle.js
+index cb6af89..e7af48c 100644
+--- skin/frontend/base/default/js/bundle.js
++++ skin/frontend/base/default/js/bundle.js
+@@ -75,6 +75,15 @@ Product.Bundle.prototype = {
+                 this.config.selected[parts[2]] = new Array();
+             }
+             this.populateQty(parts[2], selection.value);
++            if (selection.tagName == 'SELECT') {
++                elem = $('bundle-option-' + parts[2] + '-tier-prices');
++                if (selection.value != '' && this.config.options[parts[2]].selections[selection.value].customQty == 1) {
++                    tierPriceHtml = this.config.options[parts[2]].selections[selection.value].tierPriceHtml;
++                } else {
++                    tierPriceHtml = '';
++                }
++                elem.update(tierPriceHtml);
++            }
+         }
+         this.reloadPrice();
+     },
+@@ -116,6 +125,7 @@ Product.Bundle.prototype = {
+             return 0;
+         }
+         var qty = null;
++        var tierPriceInclTax, tierPriceExclTax;
+         if (this.config.options[optionId].selections[selectionId].customQty == 1 && !this.config['options'][optionId].isMulti) {
+             if ($('bundle-option-' + optionId + '-qty-input')) {
+                 qty = $('bundle-option-' + optionId + '-qty-input').value;
+@@ -125,14 +135,14 @@ Product.Bundle.prototype = {
+         } else {
+             qty = this.config.options[optionId].selections[selectionId].qty;
+         }
+-
+         if (this.config.priceType == '0') {
+             price = this.config.options[optionId].selections[selectionId].price;
+             tierPrice = this.config.options[optionId].selections[selectionId].tierPrice;
+-
+             for (var i=0; i < tierPrice.length; i++) {
+                 if (Number(tierPrice[i].price_qty) <= qty && Number(tierPrice[i].price) <= price) {
+                     price = tierPrice[i].price;
++                    tierPriceInclTax = tierPrice[i].priceInclTax;
++                    tierPriceExclTax = tierPrice[i].priceExclTax;
+                 }
+             }
+         } else {
+@@ -156,7 +166,10 @@ Product.Bundle.prototype = {
+         }
+ 
+         selection = this.config.options[optionId].selections[selectionId];
+-        if (selection.priceInclTax !== undefined) {
++        if (tierPriceInclTax !== undefined && tierPriceExclTax !== undefined) {
++            priceInclTax = tierPriceInclTax;
++            price = tierPriceExclTax;
++        } else if (selection.priceInclTax !== undefined) {
+             priceInclTax = selection.priceInclTax;
+             price = selection.priceExclTax !== undefined ? selection.priceExclTax : selection.price;
+         } else {

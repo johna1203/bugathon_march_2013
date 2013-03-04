@@ -1,0 +1,53 @@
+diff --git app/code/core/Mage/Catalog/Model/Resource/Product/Type/Configurable/Attribute/Collection.php app/code/core/Mage/Catalog/Model/Resource/Product/Type/Configurable/Attribute/Collection.php
+index b9f7ae7..997e0c7 100755
+--- app/code/core/Mage/Catalog/Model/Resource/Product/Type/Configurable/Attribute/Collection.php
++++ app/code/core/Mage/Catalog/Model/Resource/Product/Type/Configurable/Attribute/Collection.php
+@@ -240,20 +240,25 @@ class Mage_Catalog_Model_Resource_Product_Type_Configurable_Attribute_Collection
+             $values = array();
+ 
+             foreach ($this->_items as $item) {
+-               $productAttribute = $item->getProductAttribute();
+-               if (!($productAttribute instanceof Mage_Eav_Model_Entity_Attribute_Abstract)) {
+-                   continue;
+-               }
+-               $options = $productAttribute->getFrontend()->getSelectOptions();
+-               foreach ($options as $option) {
+-                   foreach ($this->getProduct()->getTypeInstance(true)->getUsedProducts(null, $this->getProduct()) as $associatedProduct) {
+-                        if (!empty($option['value'])
+-                            && $option['value'] == $associatedProduct->getData(
+-                                                        $productAttribute->getAttributeCode())) {
++                $productAttribute = $item->getProductAttribute();
++                if (!($productAttribute instanceof Mage_Eav_Model_Entity_Attribute_Abstract)) {
++                    continue;
++                }
++                $attributeCode = $productAttribute->getAttributeCode();
++
++                $usedProducts = $this->getProduct()->getTypeInstance(true)->getUsedProducts(null, $this->getProduct());
++                $options = $productAttribute->getFrontend()->getSelectOptions();
++                foreach ($options as $option) {
++                    if (empty($option['value'])) {
++                        continue;
++                    }
++                    $valueKey = $item->getId() . ':' . $option['value'];
++                    foreach ($usedProducts as $associatedProduct) {
++                        if ($option['value'] == $associatedProduct->getData($attributeCode)) {
+                             // If option available in associated product
+-                            if (!isset($values[$item->getId() . ':' . $option['value']])) {
++                            if (!isset($values[$valueKey])) {
+                                 // If option not added, we will add it.
+-                                $values[$item->getId() . ':' . $option['value']] = array(
++                                $values[$valueKey] = array(
+                                     'product_super_attribute_id' => $item->getId(),
+                                     'value_index'                => $option['value'],
+                                     'label'                      => $option['label'],
+@@ -265,8 +270,8 @@ class Mage_Catalog_Model_Resource_Product_Type_Configurable_Attribute_Collection
+                                 );
+                             }
+                         }
+-                   }
+-               }
++                    }
++                }
+             }
+ 
+             foreach ($pricings[0] as $pricing) {

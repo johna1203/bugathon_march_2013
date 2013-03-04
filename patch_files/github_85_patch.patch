@@ -1,0 +1,52 @@
+diff --git app/code/core/Mage/Core/Model/Session/Abstract/Varien.php app/code/core/Mage/Core/Model/Session/Abstract/Varien.php
+index 233dec6..327383b 100644
+--- app/code/core/Mage/Core/Model/Session/Abstract/Varien.php
++++ app/code/core/Mage/Core/Model/Session/Abstract/Varien.php
+@@ -365,9 +365,15 @@ class Mage_Core_Model_Session_Abstract_Varien extends Varien_Object
+         if ($this->useValidateHttpXForwardedFor() && $sessionData[self::VALIDATOR_HTTP_X_FORVARDED_FOR_KEY] != $validatorData[self::VALIDATOR_HTTP_X_FORVARDED_FOR_KEY]) {
+             return false;
+         }
+-        if ($this->useValidateHttpUserAgent()
+-            && $sessionData[self::VALIDATOR_HTTP_USER_AGENT_KEY] != $validatorData[self::VALIDATOR_HTTP_USER_AGENT_KEY]
+-            && !in_array($validatorData[self::VALIDATOR_HTTP_USER_AGENT_KEY], $this->getValidateHttpUserAgentSkip())) {
++        if ($this->useValidateHttpUserAgent() && $sessionData[self::VALIDATOR_HTTP_USER_AGENT_KEY]
++            != $validatorData[self::VALIDATOR_HTTP_USER_AGENT_KEY]
++        ) {
++            $userAgentValidated = $this->getValidateHttpUserAgentSkip();
++            foreach ($userAgentValidated as $agent) {
++                if (preg_match('/' . $agent . '/iu', $validatorData[self::VALIDATOR_HTTP_USER_AGENT_KEY])) {
++                    return true;
++                }
++            }
+             return false;
+         }
+ 
+diff --git app/code/core/Mage/Core/etc/config.xml app/code/core/Mage/Core/etc/config.xml
+index 6fa0957..de19a05 100644
+--- app/code/core/Mage/Core/etc/config.xml
++++ app/code/core/Mage/Core/etc/config.xml
+@@ -104,8 +104,7 @@
+             <validation>
+                 <http_user_agent_skip>
+                     <flash>Shockwave Flash</flash>
+-                    <flash_9_mac>Adobe Flash Player 9</flash_9_mac>
+-                    <flash_10_mac>Adobe Flash Player 10</flash_10_mac>
++                    <flash_mac><![CDATA[Adobe Flash Player\s{1,}\w{1,10}]]></flash_mac>
+                 </http_user_agent_skip>
+             </validation>
+         </session>
+diff --git js/mage/adminhtml/flexuploader.js js/mage/adminhtml/flexuploader.js
+index c975e37..a066e08 100644
+--- js/mage/adminhtml/flexuploader.js
++++ js/mage/adminhtml/flexuploader.js
+@@ -65,8 +65,8 @@ if(!window.Flex) {
+                 top: 300,
+                 width:  flexWidth,
+                 height: 20,
+-                src:    uploaderSrc
+-                // wmode: 'transparent'
++                src:    uploaderSrc,
++                wmode: 'transparent'
+             });
+             // this.getInnerElement('browse').disabled = true;
+             // this.getInnerElement('upload').disabled = true;
