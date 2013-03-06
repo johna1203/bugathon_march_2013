@@ -1,0 +1,43 @@
+Index: magento_saas_merge/app/code/core/Mage/Shipping/Model/Carrier/Tablerate.php
+<+>UTF-8
+===================================================================
+--- magento_saas_merge/app/code/core/Mage/Shipping/Model/Carrier/Tablerate.php  (revision 8bf9ac8)
++++ magento_saas_merge/app/code/core/Mage/Shipping/Model/Carrier/Tablerate.php	(revision 163917f550fd4ec407f7737e41e556ce8ed02459)
+@@ -85,17 +85,21 @@
+                 if ($item->getHasChildren() && $item->isShipSeparately()) {
+                     foreach ($item->getChildren() as $child) {
+                         if ($child->getFreeShipping() && !$child->getProduct()->isVirtual()) {
+-                            $freeQty += $item->getQty() * ($child->getQty() - (is_numeric($child->getFreeShipping()) ? $child->getFreeShipping() : 0));
++                            $freeQty += $item->getQty() * ($child->getQty() -
++                                (is_numeric($child->getFreeShipping()) ? $child->getFreeShipping() : 0));
+                         }
+                     }
+                 } elseif ($item->getFreeShipping()) {
+-                    $freeQty += ($item->getQty() - (is_numeric($item->getFreeShipping()) ? $item->getFreeShipping() : 0));
++                    $freeQty += ($item->getQty() -
++                        (is_numeric($item->getFreeShipping()) ? $item->getFreeShipping() : 0));
+                 }
+             }
+         }
+ 
+         if (!$request->getConditionName()) {
+-            $request->setConditionName($this->getConfigData('condition_name') ? $this->getConfigData('condition_name') : $this->_default_condition_name);
++            $request->setConditionName($this->getConfigData('condition_name')
++                ? $this->getConfigData('condition_name')
++                : $this->_default_condition_name);
+         }
+ 
+          // Package weight and qty free shipping
+@@ -130,6 +134,12 @@
+             $method->setCost($rate['cost']);
+ 
+             $result->append($method);
++        } else {
++            $error = Mage::getModel('shipping/rate_result_error');
++            $error->setCarrier('tablerate');
++            $error->setCarrierTitle($this->getConfigData('title'));
++            $error->setErrorMessage($this->getConfigData('specificerrmsg'));
++            $result->append($error);
+         }
+ 
+         return $result;
