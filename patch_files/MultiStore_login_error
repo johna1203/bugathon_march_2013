@@ -1,0 +1,26 @@
+Index: www/app/code/core/Mage/Core/Model/App.php
+===================================================================
+--- www/app/code/core/Mage/Core/Model/App.php  (revision 111306)
++++ www/app/code/core/Mage/Core/Model/App.php	(revision )
+@@ -602,6 +602,10 @@
+             /** @var $store Mage_Core_Model_Store */
+             $store->initConfigCache();
+             $store->setWebsite($websiteCollection->getItemById($store->getWebsiteId()));
++//            $website = $websiteCollection->getItemById($store->getWebsiteId());
++//            $store->setWebsite(
++//                (is_null($website)? Mage::getModel('core/website') : $website )
++//            );
+             $store->setGroup($groupCollection->getItemById($store->getGroupId()));
+ 
+             $this->_stores[$store->getId()] = $store;
+@@ -622,6 +626,10 @@
+             }
+             $group->setStores($groupStores[$group->getId()]);
+             $group->setWebsite($websiteCollection->getItemById($group->getWebsiteId()));
++//            $website = $websiteCollection->getItemById($group->getWebsiteId());
++//            $group->setWebsite(
++//                (is_null($website)? Mage::getModel('core/website') : $website )
++//            );
+ 
+             $websiteGroups[$group->getWebsiteId()][$group->getId()] = $group;
+ 
