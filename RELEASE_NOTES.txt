@@ -1,5 +1,7 @@
 ==== 1.7.0.2 ====
 
+==== 1.7.0.2 ====
+
 === Fixes ====
 Fixed: Security vulnerability in Zend_XmlRpc - http://framework.zend.com/security/advisory/ZF2012-01 
 Fixed: PayPal Standard does not display on frontend during checkout with some merchant countries
