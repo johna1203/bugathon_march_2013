@@ -393,6 +393,7 @@ class Mage_Sales_Model_Order_Item extends Mage_Core_Model_Abstract
     
     /**
      * Retrieve Bundle item qty available for cancel
+     * getQtyToInvoice() will always deliver 0 for Bundle
      *
      * @return float|integer
      */
@@ -409,6 +410,7 @@ class Mage_Sales_Model_Order_Item extends Mage_Core_Model_Abstract
     
     /**
      * Retrieve Bundel child item qty available for cancel
+     * getQtyToShip() always returns 0 for BundleItems that ship together 
      *
      * @return float|integer
      */
