@@ -130,6 +130,12 @@ class Mage_Shipping_Model_Carrier_Tablerate
             $method->setCost($rate['cost']);
 
             $result->append($method);
+        } else {
+            $error = Mage::getModel('shipping/rate_result_error');
+            $error->setCarrier('tablerate');
+            $error->setCarrierTitle($this->getConfigData('title'));
+            $error->setErrorMessage($this->getConfigData('specificerrmsg'));
+            $result->append($error);
         }
 
         return $result;
