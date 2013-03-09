@@ -73,6 +73,18 @@ class Mage_Core_Helper_AbstractTest extends PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->_helper->urlEscape($data));
     }
 
+    /**
+     * @covers Mage_Core_Helper_Abstract::escapeUrl
+     * @covers Mage_Core_Helper_Abstract::urlEscape
+     */
+    public function testEscapeUrlWithAmpersand()
+    {
+        $data = '<two>"three_&_</two>';
+        $expected = '&lt;two&gt;&quot;three_&_&lt;/two&gt;';
+        $this->assertEquals($expected, $this->_helper->escapeUrl($data));
+        $this->assertEquals($expected, $this->_helper->urlEscape($data));
+    }
+
     public function testJsQuoteEscape()
     {
         $data = array("Don't do that.", 'lost_key' => "Can't do that.");
