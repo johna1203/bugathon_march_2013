@@ -96,7 +96,11 @@ class Mage_Rating_Model_Resource_Rating_Collection extends Mage_Core_Model_Resou
     {
         $adapter = $this->getConnection();
         if (!is_array($storeId)) {
-            $storeId = array($storeId === null ? 0 : $storeId);
+            $fallbackId = -1;
+            if(Mage::app()->isSingleStoreMode()) {
+                $fallbackId = 0;
+            }
+            $storeId = array($storeId === null ? $fallbackId : $storeId);
         }
         if (empty($storeId)) {
             return $this;
