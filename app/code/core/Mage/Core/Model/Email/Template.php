@@ -174,11 +174,12 @@ class Mage_Core_Model_Email_Template extends Mage_Core_Model_Template
      * Load template by code
      *
      * @param   string $templateCode
+     * @param   int $store
      * @return   Mage_Core_Model_Email_Template
      */
-    public function loadByCode($templateCode)
+    public function loadByCode($templateCode, $store = null)
     {
-        $this->addData($this->getResource()->loadByCode($templateCode));
+        $this->addData($this->getResource()->loadByCode($templateCode, $store));
         return $this;
     }
 

@@ -145,12 +145,17 @@ class Mage_Core_Model_Resource_Email_Template extends Mage_Core_Model_Resource_D
      * Load by template code from DB.
      *
      * @param string $templateCode
-     * @param int|array $store
+     * @param int $store
      * @return array
      */
-    public function loadByCode($templateCode, $store = Mage_Core_Model_App::ADMIN_STORE_ID)
+    public function loadByCode($templateCode, $store = null)
     {
-        $select = $this->_getLoadByCodeSelect($templateCode, $store);
+        $stores = array(Mage_Core_Model_App::ADMIN_STORE_ID);
+        if ($store) {
+            $stores[] = (int) $store;
+        }
+
+        $select = $this->_getLoadByCodeSelect($templateCode, $stores);
         $result = $this->_getReadAdapter()->fetchRow($select);
 
         if (!$result) {
