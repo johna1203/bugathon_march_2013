@@ -3,7 +3,7 @@
 class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
 {
     /** @var Mage_Eav_Model_Entity_Setup */
-    protected static $_installer;
+    protected $_installer;
 
     protected $_origDeveloperMode;
 
@@ -17,12 +17,14 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
     );
 
     /**
-     * Setup config fixtures and drop test tables if they exist
+     * Instantiate eav setup instance and the config fixtures and
+     * drop test tables if they exist
      *
      * Unable to use @magentoConfigFixture here because the config
      * path isn't hardcoded
+
      */
-    public static function setUpBeforeClass()
+    protected function setUp()
     {
         // Set up config fixtures
         $config = Mage::getConfig();
@@ -35,34 +37,21 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
             self::$_fixture['tableName']
         );
 
-        self::dropTestTables();
-    }
+        $this->dropTestTables();
 
-    /**
-     * Clean up test environment
-     *
-     * - Drop test tables
-     * - Set previous include path
-     */
-    public static function tearDownAfterClass()
-    {
-        self::dropTestTables();
-    }
-
-    /**
-     * Instantiate eav setup instance
-     */
-    protected function setUp()
-    {
-        self::$_installer = Mage::getModel('eav/entity_setup', 'default_setup');
-        if (! $this->_origDeveloperMode = Mage::getIsDeveloperMode()) {
+        $this->_installer = Mage::getModel('eav/entity_setup', 'default_setup');
+        if (!$this->_origDeveloperMode = Mage::getIsDeveloperMode()) {
             Mage::setIsDeveloperMode(true);
         }
     }
 
+    /**
+     * Clean up the tables and reset developer mode setting
+     */
     protected function tearDown()
     {
-        if (! $this->_origDeveloperMode) {
+        $this->dropTestTables();
+        if (!$this->_origDeveloperMode) {
             Mage::setIsDeveloperMode(false);
         }
     }
@@ -80,20 +69,27 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
     /**
      * Drop test tables
      */
-    protected static function dropTestTables()
+    protected function dropTestTables()
     {
         // Clean up any tables that might be left over from previous tests
+
+        /* @var $resource Mage_Core_Model_Resource */
+        $resource = Mage::getSingleton('core/resource');
+        /** @var $adapter Varien_Db_Adapter_Interface */
+        $adapter = $resource->getConnection('default_read');
+
         // First drop the value tables because of the FK constraints to the entity table
-        /** @var $con Varien_Db_Adapter_Pdo_Mysql */
-        $con = Mage::getSingleton('core/resource')->getConnection('eav_write');
-        $sql = "SHOW TABLES LIKE '" . self::$_fixture['tableName'] . "_%'";
-        foreach ($con->fetchCol($sql) as $table) {
-            $con->dropTable($table);
+        foreach (array('datetime', 'decimal', 'int', 'text', 'varchar', 'char') as $type) {
+            $valueTableName = $resource->getTableName(array($this->getTableAlias(), $type));
+            if ($adapter->isTableExists($valueTableName)) {
+                $adapter->dropTable($valueTableName);
+            }
         }
+
         // Finally drop the entity table
-        $sql = "SHOW TABLES LIKE '" . self::$_fixture['tableName'] . "'";
-        foreach ($con->fetchCol($sql) as $table) {
-            $con->dropTable($table);
+        $entityTable = $resource->getTableName($this->getTableAlias());
+        if ($adapter->isTableExists($entityTable)) {
+            $adapter->dropTable($entityTable);
         }
     }
 
@@ -103,7 +99,8 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
     public function assertPreConditions()
     {
         $result = Mage::getSingleton('core/resource')->getTableName($this->getTableAlias());
-        $this->assertEquals(self::$_fixture['tableName'], $result);
+        $prefix = Mage::getConfig()->getTablePrefix();
+        $this->assertEquals($prefix . self::$_fixture['tableName'], $result);
     }
 
     /**
@@ -118,7 +115,7 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
         /** @var $adapter Varien_Db_Adapter_Interface */
         $adapter = $resource->getConnection('default_read');
 
-        self::$_installer->createEntityTables($this->getTableAlias());
+        $this->_installer->createEntityTables($this->getTableAlias());
 
         $this->assertTrue(
             $adapter->isTableExists($resource->getTableName($this->getTableAlias())),
