@@ -140,3 +140,13 @@ category_page_index:
     uimap:
         form: *categoryPage
         messages: *categoryPageMessages
+
+catalogsearch_result:
+    mca: catalogsearch/result/?q=%searchQuery%
+    title: Search results for: '%searchQuery%'
+    uimap: *categoryUIMap
+
+custom_catalog_search_result:
+    mca: catalogsearch/result/index/%customSearch%
+    title: Search results for: '%searchQuery%'
+    uimap: *categoryUIMap

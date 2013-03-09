@@ -44,6 +44,13 @@ home:
                         pageelements:
                           compare_block_empty: //p[text()='You have no items to compare.']
                           compare_block_title: //div[@class='block-title' and contains(. /strong/span, 'Compare Products')]
+                -
+                    quick_search:
+                        xpath: //form[@id="search_mini_form"]
+                        fields:
+                          quick_search_input: //input[@id="search"]
+                        buttons:
+                          quick_search_submit: //button[@title='Search']
         messages: &homeMessages
             tag_accepted_success: //li[normalize-space(@class)='success-msg' and contains(.,'%tagQty% tag(s) have been accepted for moderation.')]
             confirmation_for_removing_product_from_compare: Are you sure you would like to remove this item from the compare products?

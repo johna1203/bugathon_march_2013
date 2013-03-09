@@ -271,7 +271,11 @@ abstract class Mage_Core_Helper_Abstract
      */
     public function escapeUrl($data)
     {
-        return htmlspecialchars($data);
+        $escapedUrl = htmlspecialchars($data);
+        if (strpos($escapedUrl, '&amp;') !== false) {
+            $escapedUrl = str_replace('&amp;', '&', $escapedUrl);
+        }
+        return $escapedUrl;
     }
 
     /**

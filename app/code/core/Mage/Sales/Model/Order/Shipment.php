@@ -560,7 +560,7 @@ class Mage_Sales_Model_Order_Shipment extends Mage_Sales_Model_Abstract
             $this->setOrderId($this->getOrder()->getId());
             $this->setShippingAddressId($this->getOrder()->getShippingAddress()->getId());
         }
-        if ($this->getPackages()) {
+        if ($this->getPackages() && $this->dataHasChangedFor('packages')) {
             $this->setPackages(serialize($this->getPackages()));
         }
 

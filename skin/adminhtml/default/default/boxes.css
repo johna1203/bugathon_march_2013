@@ -921,9 +921,8 @@ ul.item-options li { padding-left:.7em; }
 
 /* Gift Messages */
 .giftmessage-order-create .entire-order,
-.giftmessage-order-create .each-order-item { background-color:#eee; padding:6px 14px; height:275px;  }
+.giftmessage-order-create .each-order-item { padding:6px 14px; }
 .giftmessage-order-create .entire-order .entry-edit,
-.giftmessage-order-create .each-order-item .scroll { height:250px; overflow:auto; }
 .giftmessage-order-create .single { width:100%; float:left; padding:1.2em 1.5em; }
 .giftmessage-order-create h5 { font-size:12px; font-weight:normal; line-height:1.5; margin-bottom:10px; }
 .giftmessage-order-create h6 { font-size:11px; font-weight:normal; line-height:1.55; background-color:#cfcfcf; margin-bottom:10px; padding:2px 6px; width:95%; }
