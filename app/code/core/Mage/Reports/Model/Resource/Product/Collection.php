@@ -293,35 +293,55 @@ class Mage_Reports_Model_Resource_Product_Collection extends Mage_Catalog_Model_
             $fieldName            = $orderTableAliasName . '.created_at';
             $orderJoinCondition[] = $this->_prepareBetweenSql($fieldName, $from, $to);
         }
-
-        $this->getSelect()->reset()
-            ->from(
+        if ($this->isEnabledFlat()) {
+            $this->getSelect()->reset()
+                ->from(
                 array('order_items' => $this->getTable('sales/order_item')),
                 array(
                     'ordered_qty' => 'SUM(order_items.qty_ordered)',
                     'order_items_name' => 'order_items.name'
                 ))
-            ->joinInner(
-                array('order' => $this->getTable('sales/order')),
-                implode(' AND ', $orderJoinCondition),
-                array())
-            ->joinLeft(
-                array('e' => $this->getProductEntityTableName()),
-                implode(' AND ', $productJoinCondition),
+                ->joinInner(
+                    array('order' => $this->getTable('sales/order')),
+                    implode(' AND ', $orderJoinCondition),
+                    array())
+                ->joinLeft(
+                    array('e' => $this->getResource()->getFlatTableName()),
+                    "e.entity_id = order_items.product_id"
+                )
+                ->where('parent_item_id IS NULL')
+                ->group('order_items.product_id')
+                ->having('SUM(order_items.qty_ordered) > ?', 0);
+        } else {
+            $this->getSelect()->reset()
+                ->from(
+                array('order_items' => $this->getTable('sales/order_item')),
                 array(
-                    'entity_id' => 'order_items.product_id',
-                    'entity_type_id' => 'e.entity_type_id',
-                    'attribute_set_id' => 'e.attribute_set_id',
-                    'type_id' => 'e.type_id',
-                    'sku' => 'e.sku',
-                    'has_options' => 'e.has_options',
-                    'required_options' => 'e.required_options',
-                    'created_at' => 'e.created_at',
-                    'updated_at' => 'e.updated_at'
+                    'ordered_qty' => 'SUM(order_items.qty_ordered)',
+                    'order_items_name' => 'order_items.name'
                 ))
-            ->where('parent_item_id IS NULL')
-            ->group('order_items.product_id')
-            ->having('SUM(order_items.qty_ordered) > ?', 0);
+                ->joinInner(
+                    array('order' => $this->getTable('sales/order')),
+                    implode(' AND ', $orderJoinCondition),
+                    array())
+                ->joinLeft(
+                    array('e' => $this->getProductEntityTableName()),
+                    implode(' AND ', $productJoinCondition),
+                    array(
+                        'entity_id' => 'order_items.product_id',
+                        'entity_type_id' => 'e.entity_type_id',
+                        'attribute_set_id' => 'e.attribute_set_id',
+                        'type_id' => 'e.type_id',
+                        'sku' => 'e.sku',
+                        'has_options' => 'e.has_options',
+                        'required_options' => 'e.required_options',
+                        'created_at' => 'e.created_at',
+                        'updated_at' => 'e.updated_at'
+                    ))
+                ->where('parent_item_id IS NULL')
+                ->group('order_items.product_id')
+                ->having('SUM(order_items.qty_ordered) > ?', 0);
+        }
         return $this;
     }
 
