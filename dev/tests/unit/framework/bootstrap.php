@@ -13,10 +13,10 @@ ini_set('display_errors', 1);
 
 $includePaths = array(
     get_include_path(),
-    './testsuite',
-    '../../../lib',
-    '../../../app/code/core',
-    '../../../app/'
+    dirname(__FILE__) . '/../testsuite',
+    dirname(__FILE__) . '/../../../../lib',
+    dirname(__FILE__) . '/../../../../app/code/core',
+    dirname(__FILE__) . '/../../../../app/'
 );
 set_include_path(implode(PATH_SEPARATOR, $includePaths));
 
