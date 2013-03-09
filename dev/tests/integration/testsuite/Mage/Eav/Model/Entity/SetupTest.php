@@ -5,6 +5,8 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
     /** @var Mage_Eav_Model_Entity_Setup */
     protected static $_installer;
 
+    protected $_origDeveloperMode;
+
     /**
      * @var array
      */
@@ -50,6 +52,16 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         self::$_installer = Mage::getModel('eav/entity_setup', 'default_setup');
+        if (! $this->_origDeveloperMode = Mage::getIsDeveloperMode()) {
+            Mage::setIsDeveloperMode(true);
+        }
+    }
+
+    protected function tearDown()
+    {
+        if (! $this->_origDeveloperMode) {
+            Mage::setIsDeveloperMode(false);
+        }
     }
 
     /**
@@ -98,7 +110,6 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
      */
     public function createEntityTables()
     {
-
         /* @var $resource Mage_Core_Model_Resource */
         $resource = Mage::getSingleton('core/resource');
         /** @var $adapter Varien_Db_Adapter_Interface */
