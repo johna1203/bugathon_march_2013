@@ -1358,14 +1358,13 @@ class Mage_Eav_Model_Entity_Setup extends Mage_Core_Model_Resource_Setup
             $tables[$this->getTable($eavTableName)] = $eavTable;
         }
 
-        $connection->beginTransaction();
+        // DDL operations are forbidden within transactions
+        // See Varien_Db_Adapter_Pdo_Mysql::_checkDdlTransaction()
         try {
             foreach ($tables as $tableName => $table) {
                 $connection->createTable($table);
             }
-            $connection->commit();
         } catch (Exception $e) {
-           $connection->rollBack();
            throw Mage::exception('Mage_Eav', Mage::helper('eav')->__('Can\'t create table: %s', $tableName));
         }
 
