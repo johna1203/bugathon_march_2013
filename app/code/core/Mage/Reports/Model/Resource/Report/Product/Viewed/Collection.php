@@ -79,6 +79,7 @@ class Mage_Reports_Model_Resource_Report_Product_Viewed_Collection
                     'product_id'     => 'product_id',
                     'product_name'   => 'MAX(product_name)',
                     'product_price'  => 'MAX(product_price)',
+                    'product_sku'    => 'MAX(product_sku)',
                 );
                 if ('year' == $this->_period) {
                     $this->_selectedColumns['period'] = $adapter->getDateFormatSql('period', '%Y');
