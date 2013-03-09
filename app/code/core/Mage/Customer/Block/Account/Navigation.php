@@ -50,6 +50,12 @@ class Mage_Customer_Block_Account_Navigation extends Mage_Core_Block_Template
         return $this;
     }
 
+    public function removeLink($name)
+    {
+        unset($this->_links[$name]);
+        return $this;
+    }
+
     public function setActive($path)
     {
         $this->_activeLink = $this->_completePath($path);
