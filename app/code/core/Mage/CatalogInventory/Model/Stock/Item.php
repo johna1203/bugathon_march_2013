@@ -436,9 +436,9 @@ class Mage_CatalogInventory_Model_Stock_Item extends Mage_Core_Model_Abstract
      *
      * @return bool
      */
-    public function getCanBackInStock()
+    public function getCanBackInStock($storeId = null)
     {
-        return Mage::getStoreConfigFlag(self::XML_PATH_CAN_BACK_IN_STOCK);
+        return Mage::getStoreConfigFlag(self::XML_PATH_CAN_BACK_IN_STOCK, $storeId);
     }
 
     /**
