@@ -92,7 +92,7 @@ class Mage_Adminhtml_Block_System_Email_Template_Edit_Form extends Mage_Adminhtm
         }
 
         $templates = Mage_Core_Model_Email_Template::getDefaultTemplates();
-        if (isset($templates[$template->getTemplateCode()])) {
+        if (!$templateId || isset($templates[$template->getTemplateCode()])) {
 
             $fieldset->addField('template_code', 'select', array(
                 'label' => Mage::helper('adminhtml')->__('Template Name'),
