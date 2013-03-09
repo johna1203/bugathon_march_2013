@@ -35,13 +35,37 @@ system_email_template:
         buttons:
             add_new_template: //button[span='Add New Template' or span='Add New']
 
+        messages: &templateMessages
+            success_saved_template: //li[normalize-space(@class)='success-msg' and contains(.,'The email template has been saved.')]
 
 # 'New Template' Page
 create_template:
     mca: system_email_template/new
     title: New Template / Transactional Emails / System / Magento Admin
     uimap:
+        form: &newTemplateForm
+            fieldsets:
+                -
+                    email_template_load_form:
+                        xpath: //form[@id='email_template_load_form']
+                        dropdowns:
+                            template_select: //select[@id='template_select']
+                            locale_select: //select[@id='locale_select']
+
+                -
+                    email_template_edit_form:
+                        xpath: //form[@id='email_template_edit_form']
+                        fields:
+                            template_code: //input[@name='template_code']
+                            template_subject: //input[@name='template_subject']
+                            template_text: //textarea[@name='template_text']
+                            template_styles: //input[@name='template_styles']
+                        multiselects:
+                            store_view: //select[@name='stores[]']
+
         buttons:
             back: //button[span='Back']
             reset: //button[span='Reset']
             save_template: //button[span='Save Template']
+
+        messages: *templateMessages

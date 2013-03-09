@@ -49,7 +49,7 @@ class Core_Mage_Email_EmailTest extends Mage_Selenium_TestCase
      *
      * @test
      */
-    public function createTransactionalEmail()
+    public function navigation()
     {
         $this->assertTrue($this->buttonIsPresent('add_new_template'),
             'There is no "Add New Template" button on the page');
@@ -58,5 +58,17 @@ class Core_Mage_Email_EmailTest extends Mage_Selenium_TestCase
         $this->assertTrue($this->buttonIsPresent('back'), 'There is no "Back" button on the page');
         $this->assertTrue($this->buttonIsPresent('save_template'), 'There is no "Save" button on the page');
         $this->assertTrue($this->buttonIsPresent('reset'), 'There is no "Reset" button on the page');
+    }
+
+    /**
+     *
+     * @test
+     * @depends navigation
+     */
+    public function createTransactionalEmail()
+    {
+        $data = $this->loadDataSet('Email', 'create_new_transactional_email');
+        $this->emailHelper()->createTemplate($data);
+        $this->assertMessagePresent('success', 'success_saved_template');
     }
 }
