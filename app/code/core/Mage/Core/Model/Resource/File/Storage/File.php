@@ -185,7 +185,7 @@ class Mage_Core_Model_Resource_File_Storage_File
             $ioFile->streamUnlock();
             $ioFile->streamClose();
 
-            if (is_int($result)) {
+            if ($result) {
                 return true;
             }
 
