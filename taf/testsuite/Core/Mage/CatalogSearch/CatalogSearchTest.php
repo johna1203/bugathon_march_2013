@@ -45,21 +45,21 @@ class Core_Mage_CatalogSearch_CatalogSearchTest extends Mage_Selenium_TestCase
      */
     public function preconditionsForTests()
     {
+        //Data
         $searchQuery = $this->generate('string', 20);
-
+        //Steps
         $this->loginAdminUser();
         $this->navigate('manage_products');
-
-        for ($i=0; $i<=15; $i++) {
-            $name = $searchQuery.' Simple Product '.$i;
-            $sku = strtolower($searchQuery).'_simple_sku_'.$i;
-
+        //Creating products
+        for ($i = 0; $i <= 9; $i++) {
+            $name = $searchQuery . ' Simple Product ' . $i;
+            $sku = strtolower($searchQuery) . '_simple_sku_' . $i;
             $simple = $this->loadDataSet(
                 'Products',
                 'simple_product_visible',
                 array(
-                    'general_name' => $name,
-                    'general_sku' => $sku
+                     'general_name' => $name,
+                     'general_sku' => $sku
                 )
             );
             $this->productHelper()->createProduct($simple);
@@ -71,7 +71,7 @@ class Core_Mage_CatalogSearch_CatalogSearchTest extends Mage_Selenium_TestCase
 
         return array(
             'searchQuery' => $searchQuery,
-            'productName' => $searchQuery.' Simple Product 9'
+            'productName' => $searchQuery . ' Simple Product 9'
         );
     }
 
@@ -80,32 +80,39 @@ class Core_Mage_CatalogSearch_CatalogSearchTest extends Mage_Selenium_TestCase
      * compare product list.
      *
      * @param array $data
+     *
      * @test
      * @depends preconditionsForTests
      */
-    public function addProductToCompareFromSecondCatalogSeachPage($data)
+    public function addProductToCompareFromSecondCatalogSeachPage(array $data)
     {
-        // Data
-        $searchQuery = $data['searchQuery'];
+        //Data
+        $searchQueryData = $data['searchQuery'];
         $productName = $data['productName'];
-
-        // Steps
+        $searchQuery = 'q=' . $searchQueryData;
+        $customSearch = '?';
+        //Steps
         $this->frontend();
-        $this->fillField('quick_search_input', $searchQuery);
-        $this->addParameter('searchQuery', $searchQuery);
+        $this->fillField('quick_search_input', $searchQueryData);
+        $this->addParameter('searchQuery', $searchQueryData);
         $this->clickButton('quick_search_submit');
-
-        $this->addParameter('pageNumber', 2);
-        $this->assertTrue($this->controlIsVisible('link', 'page_number'), 'Page 2 does not exist in pagination.');
-        $this->clickControl('link', 'page_number');
-
+        if ($this->getControlAttribute('dropdown', 'show_per_page', 'selectedValue') != '9') {
+            $customSearch =  $customSearch . '&limit=9&';
+            $this->addParameter('customSearch', $customSearch . $searchQuery);
+            $this->fillDropdown('show_per_page', 9);
+        }
+        if ($this->getControlAttribute('dropdown', 'sort_by', 'selectedValue') != 'name') {
+            $customSearch .= 'order=name&';
+            $this->addParameter('customSearch', $customSearch . $searchQuery);
+            $this->fillDropdown('sort_by', 'Name');
+        }
+        $customSearch .= 'p=2&dir=asc&';
+        $this->addParameter('customSearch', $customSearch . $searchQuery);
         $this->addParameter('productName', $productName);
-        $this->assertTrue($this->controlIsVisible('fieldset', 'catalogsearch_product'));
-
-        $this->assertTrue($this->controlIsVisible('link', 'add_to_compare'));
+        $this->clickControl('link', 'next_page');
+        // Verifying
+        $this->assertTrue($this->controlIsVisible('pageelement', 'product_name_header'));
         $this->clickControl('link', 'add_to_compare');
-
-        $this->addParameter('productName', $productName);
-        $this->assertTrue($this->controlIsVisible('fieldset', 'catalogsearch_product'));
+        $this->assertTrue($this->controlIsVisible('pageelement', 'product_name_header'));
     }
 }
