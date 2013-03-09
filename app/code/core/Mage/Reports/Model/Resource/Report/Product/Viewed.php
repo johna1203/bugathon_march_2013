@@ -113,7 +113,8 @@ class Mage_Reports_Model_Resource_Report_Product_Viewed extends Mage_Sales_Model
                     )
                 )
             ),
-            'views_num'            => $viewsNumExpr
+            'views_num'            => $viewsNumExpr,
+            'product_sku'          => 'product.sku',
         );
 
         $select
