@@ -11,6 +11,7 @@
 
 /**
  * @group module:Mage_Core
+ * @magentoDataFixture Mage/Core/Model/Email/_files/template.php
  */
 class Mage_Core_Model_Email_TemplateTest extends PHPUnit_Framework_TestCase
 {
@@ -27,7 +28,7 @@ class Mage_Core_Model_Email_TemplateTest extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->_mail = $this->getMock(
-            'Zend_Mail', array('send', 'addTo', 'addBcc', 'setReturnPath', 'setReplyTo'), array('utf-8')
+            'Zend_Mail', array('send', 'addTo', 'addBcc', 'setReturnPath', 'setReplyTo', 'setSubject', 'setBodyHTML'), array('utf-8')
         );
         $this->_model = $this->getMock('Mage_Core_Model_Email_Template', array('getMail'));
         $this->_model->expects($this->any())->method('getMail')->will($this->returnCallback(array($this, 'getMail')));
@@ -141,6 +142,27 @@ class Mage_Core_Model_Email_TemplateTest extends PHPUnit_Framework_TestCase
             array('name' => 'Sender Name', 'email' => 'sender@example.com'), 'recipient@example.com', 'Recipient Name'
         );
         $this->assertEquals('customer_create_account_email_template', $this->_model->getId());
+        $this->assertTrue($this->_model->getSentSuccess());
+    }
+
+    public function testSendTransactionalFromDatabase()
+    {
+        $this->_mail->expects($this->once())->method('setSubject')->with('=?utf-8?B?TmV3IHBhc3N3b3JkIGZvciBNYXg=?=');
+        $this->_mail->expects($this->once())->method('setBodyHTML')->with('<strong>Your new password is:</strong> PASS&amp;WORD');
+
+        $this->_model->sendTransactional(
+            'customer_password_forgot_email_template',
+            array('name' => 'Sender Name', 'email' => 'sender@example.com'),
+            'recipient@example.com',
+            'Recipient Name',
+            array(
+                'customer' => new Varien_Object(array(
+                    'name' => 'Max',
+                    'password' => 'PASS&WORD',
+                )),
+            )
+        );
+        $this->assertEquals(1, $this->_model->getId());
         $this->assertTrue($this->_model->getSentSuccess());
     }
 
