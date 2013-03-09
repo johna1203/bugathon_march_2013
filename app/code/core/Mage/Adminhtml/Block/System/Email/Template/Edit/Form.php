@@ -78,7 +78,7 @@ class Mage_Adminhtml_Block_System_Email_Template_Edit_Form extends Mage_Adminhtm
                     '</script>',
             ));
         }
-
+        
         if (!$templateId) {
             $fieldset->addField('used_default_for', 'label', array(
                 'label' => Mage::helper('adminhtml')->__('Used as Default For'),
@@ -91,12 +91,25 @@ class Mage_Adminhtml_Block_System_Email_Template_Edit_Form extends Mage_Adminhtm
             ));
         }
 
-        $fieldset->addField('template_code', 'text', array(
-            'name'=>'template_code',
-            'label' => Mage::helper('adminhtml')->__('Template Name'),
-            'required' => true
+        $templates = Mage_Core_Model_Email_Template::getDefaultTemplates();
+        if (isset($templates[$template->getTemplateCode()])) {
 
-        ));
+            $fieldset->addField('template_code', 'select', array(
+                'label' => Mage::helper('adminhtml')->__('Template Name'),
+                'name' => 'template_code',
+                'required' => true,
+                'values' => Mage_Core_Model_Email_Template::getDefaultTemplatesAsOptionsArray(),
+            ));
+
+        } else {
+
+            $fieldset->addField('template_code', 'text', array(
+                'name'=>'template_code',
+                'label' => Mage::helper('adminhtml')->__('Template Name'),
+                'required' => true
+            ));
+
+        }
 
         $fieldset->addField('template_subject', 'text', array(
             'name'=>'template_subject',
