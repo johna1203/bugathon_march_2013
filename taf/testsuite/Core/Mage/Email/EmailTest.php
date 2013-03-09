@@ -35,6 +35,8 @@
  */
 class Core_Mage_Email_EmailTest extends Mage_Selenium_TestCase
 {
+    protected $_templateToBeDeleted;
+
     /**
      * <p>Preconditions:</p>
      * <p>Navigate to System -> Manage Customers</p>
@@ -43,6 +45,15 @@ class Core_Mage_Email_EmailTest extends Mage_Selenium_TestCase
     {
         $this->loginAdminUser();
         $this->navigate('system_email_template');
+    }
+
+    protected function tearDownAfterTest()
+    {
+        if ($this->_templateToBeDeleted) {
+            $this->loginAdminUser();
+            $this->navigate('system_email_template');
+            $this->emailHelper()->deleteTemplate($this->_templateToBeDeleted);
+        }
     }
 
     /**
@@ -71,6 +82,8 @@ class Core_Mage_Email_EmailTest extends Mage_Selenium_TestCase
         $this->emailHelper()->createTemplate($data);
         $this->assertMessagePresent('success', 'success_saved_template');
 
+        $this->_templateToBeDeleted = $data['template_code'];
+
         return $data;
     }
 
@@ -78,25 +91,29 @@ class Core_Mage_Email_EmailTest extends Mage_Selenium_TestCase
      *
      * @param array $data
      * @test
-     * @depends createTransactionalEmail
+     * @depends navigation
      */
-    public function createDuplicateEmail($data)
+    public function createDuplicateEmail()
     {
+        $data = $this->loadDataSet('Email', 'create_new_transactional_email');
+        $this->emailHelper()->createTemplate($data);
         $this->emailHelper()->createTemplate($data);
         $this->assertMessagePresent('error', 'error_duplicated_template');
+
+        $this->_templateToBeDeleted = $data['template_code'];
     }
 
     /**
      *
      * @param array $data
      * @test
-     * @depends createTransactionalEmail
+     * @depends navigation
      */
-    public function deleteEmail($data)
+    public function deleteEmail()
     {
-        $this->addParameter('elementTitle', $data['template_code']);
-        $this->searchAndOpen(array('code' => $data['template_code']));
-        $this->clickControlAndConfirm('button', 'delete_template', 'confirmation_for_delete_template');
+        $data = $this->loadDataSet('Email', 'create_new_transactional_email');
+        $this->emailHelper()->createTemplate($data);
+        $this->emailHelper()->deleteTemplate($data['template_code']);
 
         $this->assertMessagePresent('success', 'success_deleted_template');
     }

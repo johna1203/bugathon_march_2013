@@ -75,10 +75,11 @@ create_template:
                     email_template_edit_form:
                         xpath: //form[@id='email_template_edit_form']
                         fields:
-                            template_code: //input[@name='template_code']
                             template_subject: //input[@name='template_subject']
                             template_text: //textarea[@name='template_text']
                             template_styles: //input[@name='template_styles']
+                        dropdowns:
+                            template_code: //select[@name='template_code']
                         multiselects:
                             store_view: //select[@name='stores[]']
 

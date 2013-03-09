@@ -60,19 +60,14 @@ class Core_Mage_Email_Helper extends Mage_Selenium_TestCase
     }
 
     /**
-     * Create Template.
-     * PreConditions: 'Delete Templates' page is opened.
+     * Delete Template.
      *
-     * @param string $code | templte_code
+     * @param string $templateCode
      */
-    public function deleteTemplate(string $code)
+    public function deleteTemplate($templateCode)
     {
-        // Click 'Add New Template' button.
-        $this->clickButton('add_new_template');
-
-        // Fill in 'Template' form
-        $this->fillFieldset($data, 'email_template_edit_form');
-
-        $this->saveForm('save_template');
+        $this->addParameter('elementTitle', $templateCode);
+        $this->searchAndOpen(array('code' => $templateCode));
+        $this->clickControlAndConfirm('button', 'delete_template', 'confirmation_for_delete_template');
     }
 }
