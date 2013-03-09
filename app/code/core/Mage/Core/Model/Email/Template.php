@@ -394,6 +394,13 @@ class Mage_Core_Model_Email_Template extends Mage_Core_Model_Template
      **/
     public function send($email, $name = null, array $variables = array())
     {
+        Mage::dispatchEvent('core_email_template_send_before', array(
+            'email' => $email,
+            'name' => $name,
+            'template' => $this,
+            'variables' => $variables,
+        ));
+
         if (!$this->isValidForSend()) {
             Mage::logException(new Exception('This letter cannot be sent.')); // translation is intentionally omitted
             return false;
