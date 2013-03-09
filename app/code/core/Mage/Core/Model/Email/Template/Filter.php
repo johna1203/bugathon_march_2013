@@ -31,6 +31,8 @@
  * @category   Mage
  * @package    Mage_Core
  * @author     Magento Core Team <core@magentocommerce.com>
+ *
+ * @method Mage_Core_Model_Email_Template_Filter setUseAbsoluteLinks($bool)
  */
 class Mage_Core_Model_Email_Template_Filter extends Varien_Filter_Template
 {
