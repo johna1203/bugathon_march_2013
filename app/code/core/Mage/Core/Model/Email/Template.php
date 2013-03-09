@@ -62,6 +62,16 @@
  * @method Mage_Core_Model_Email_Template setOrigTemplateCode(string $value)
  * @method string getOrigTemplateVariables()
  * @method Mage_Core_Model_Email_Template setOrigTemplateVariables(string $value)
+ * @method getSenderEmail()
+ * @method Mage_Core_Model_Email_Template setSenderEmail(string $value)
+ * @method getSenderName()
+ * @method Mage_Core_Model_Email_Template setSenderName(string $value)
+ * @method getSentSuccess()
+ * @method Mage_Core_Model_Email_Template setSentSuccess(boolean $value)
+ * @method getTemplateId()
+ * @method Mage_Core_Model_Email_Template setTemplateId($value)
+ * @method int getUseAbsoluteLinks()
+ * @method Mage_Core_Model_Email_Template setUseAbsoluteLinks(int $value)
  *
  * @category    Mage
  * @package     Mage_Core
@@ -163,10 +173,14 @@ class Mage_Core_Model_Email_Template extends Mage_Core_Model_Template
     public function getTemplateFilter()
     {
         if (empty($this->_templateFilter)) {
-            $this->_templateFilter = Mage::getModel('core/email_template_filter');
-            $this->_templateFilter->setUseAbsoluteLinks($this->getUseAbsoluteLinks())
-                ->setStoreId($this->getDesignConfig()->getStore());
+            /** @var $templateFilter Mage_Core_Model_Email_Template_Filter */
+            $templateFilter = Mage::getModel('core/email_template_filter');
+            $templateFilter->setUseAbsoluteLinks($this->getUseAbsoluteLinks())
+                ->setStoreId($this->getDesignConfig()->getData('store'));
+
+            $this->_templateFilter = $templateFilter;
         }
+
         return $this->_templateFilter;
     }
 
@@ -377,6 +391,8 @@ class Mage_Core_Model_Email_Template extends Mage_Core_Model_Template
     public function getInclude($template, array $variables)
     {
         $thisClass = __CLASS__;
+
+        /** @var $includeTemplate Mage_Core_Model_Email_Template */
         $includeTemplate = new $thisClass();
 
         $includeTemplate->loadByCode($template);
@@ -451,6 +467,14 @@ class Mage_Core_Model_Email_Template extends Mage_Core_Model_Template
         $mail->setFrom($this->getSenderEmail(), $this->getSenderName());
 
         try {
+            Mage::dispatchEvent('core_email_template_send_before', array(
+                'mail' => $mail,
+                'name' => $name,
+                'recipient_emails' => $emails,
+                'template' => $this,
+                'variables' => $variables,
+            ));
+
             $mail->send();
             $this->_mail = null;
         }
@@ -477,8 +501,8 @@ class Mage_Core_Model_Email_Template extends Mage_Core_Model_Template
     public function sendTransactional($templateId, $sender, $email, $name, $vars=array(), $storeId=null)
     {
         $this->setSentSuccess(false);
-        if (($storeId === null) && $this->getDesignConfig()->getStore()) {
-            $storeId = $this->getDesignConfig()->getStore();
+        if (($storeId === null) && $this->getDesignConfig()->getData('store')) {
+            $storeId = $this->getDesignConfig()->getData('store');
         }
 
         if (is_numeric($templateId)) {
