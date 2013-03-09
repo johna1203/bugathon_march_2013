@@ -135,7 +135,8 @@ class Mage_Core_Model_Resource_Email_Template extends Mage_Core_Model_Resource_D
                 't.template_id = ts.template_id',
                 array())
             ->where('t.template_code = ?', $templateCode)
-            ->where('ts.store_id IN (?)', $store);
+            ->where('ts.store_id IN (?)', $store)
+            ->order('ts.store_id DESC');
 
         return $select;
     }
