@@ -667,7 +667,7 @@ class Mage_Core_Model_Config extends Mage_Core_Model_Config_Base
 
         $res = parent::getNode($path);
 
-        if (!empty($path) && !$res) {
+        if (!empty($path) && !$res && ($scope == 'stores' || $scope == 'websites')) {
             $parts = is_array($path) ? $path : explode('/', $path);
             if ($parts[0] == 'stores') {
                 // fallback to website level
