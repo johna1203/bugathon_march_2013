@@ -165,4 +165,18 @@ class Mage_Catalog_Block_Product_Price extends Mage_Core_Block_Template
         $html = $this->hasRealPriceHtml() ? $this->getRealPriceHtml() : $product->getRealPriceHtml();
         return Mage::helper('core')->jsonEncode($html);
     }
+
+    /**
+     * Retrieve attribute instance by name, id or config node
+     *
+     * If attribute is not found false is returned
+     *
+     * @param string|integer|Mage_Core_Model_Config_Element $attribute
+     * @return Mage_Eav_Model_Entity_Attribute_Abstract || false
+     */
+    public function getProductAttribute($attribute)
+    {
+        return $this->getProduct()->getResource()->getAttribute($attribute);
+    }
+
 }
