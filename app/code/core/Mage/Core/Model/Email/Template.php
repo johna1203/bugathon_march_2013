@@ -485,8 +485,16 @@ class Mage_Core_Model_Email_Template extends Mage_Core_Model_Template
         if (is_numeric($templateId)) {
             $this->load($templateId);
         } else {
-            $localeCode = Mage::getStoreConfig('general/locale/code', $storeId);
-            $this->loadDefault($templateId, $localeCode);
+
+            // try to load template from database by code
+            $this->loadByCode($templateId, $storeId);
+
+            if (!is_numeric($this->getId())) {
+
+                // template could not be loaded from database, use locale templates
+                $localeCode = Mage::getStoreConfig('general/locale/code', $storeId);
+                $this->loadDefault($templateId, $localeCode);
+            }
         }
 
         if (!$this->getId()) {
