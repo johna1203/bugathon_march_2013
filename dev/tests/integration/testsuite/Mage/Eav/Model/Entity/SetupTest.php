@@ -118,7 +118,7 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
         self::$_installer->createEntityTables($this->getTableAlias());
 
         $this->assertTrue(
-            $adapter->isTableExists(self::$_config['tableName']),
+            $adapter->isTableExists($resource->getTableName($this->getTableAlias())),
             "The base table {$this->getTableAlias()} was not created."
         );
 
