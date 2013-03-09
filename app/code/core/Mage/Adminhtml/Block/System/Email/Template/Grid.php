@@ -60,10 +60,17 @@ class Mage_Adminhtml_Block_System_Email_Template_Grid extends Mage_Adminhtml_Blo
             )
         );
 
+        $options = array();
+        foreach (Mage_Core_Model_Email_Template::getDefaultTemplatesAsOptionsArray() as $option) {
+            $options[$option['value']] = $option['label'];
+        }
         $this->addColumn('code',
             array(
                 'header'=>Mage::helper('adminhtml')->__('Template Name'),
-                'index'=>'template_code'
+                'index' => 'template_code',
+                'type'  => 'options',
+                'options' => $options,
+                'show_missing_option_values' => true,
         ));
 
         $this->addColumn('added_at',

@@ -82,7 +82,16 @@ class Mage_Adminhtml_System_Email_TemplateController extends Mage_Adminhtml_Cont
             $this->_addBreadcrumb(Mage::helper('adminhtml')->__('New Template'), Mage::helper('adminhtml')->__('New System Template'));
         }
 
-        $this->_title($template->getId() ? $template->getTemplateCode() : $this->__('New Template'));
+        $title = $this->__('New Template');
+        if ($template->getId()) {
+            $title = $template->getTemplateCode();
+        }
+        foreach (Mage_Core_Model_Email_Template::getDefaultTemplatesAsOptionsArray() as $option) {
+            if ($option['value'] === $template->getTemplateCode()) {
+                $title = $option['label']; 
+            }
+        }
+        $this->_title($title);
 
         $this->_addContent($this->getLayout()->createBlock('adminhtml/system_email_template_edit', 'template_edit')
                                                             ->setEditMode((bool)$this->getRequest()->getParam('id')));

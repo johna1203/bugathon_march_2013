@@ -59,7 +59,7 @@ class Mage_Adminhtml_Block_Widget_Grid_Column_Renderer_Options
                 return implode(', ', $res);
             } elseif (isset($options[$value])) {
                 return $this->escapeHtml($options[$value]);
-            } elseif (in_array($value, $options)) {
+            } elseif (in_array($value, $options) || $showMissingOptionValues) {
                 return $this->escapeHtml($value);
             }
         }
