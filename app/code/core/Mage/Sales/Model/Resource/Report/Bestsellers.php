@@ -96,6 +96,7 @@ class Mage_Sales_Model_Resource_Report_Bestsellers extends Mage_Sales_Model_Reso
                 'period'                 => $periodExpr,
                 'store_id'               => 'source_table.store_id',
                 'product_id'             => 'order_item.product_id',
+                'product_sku'            => 'order_item.sku',
                 'product_name'           => new Zend_Db_Expr(
                     sprintf('MIN(%s)',
                         $adapter->getIfNullSql('product_name.value','product_default_name.value')
@@ -228,6 +229,7 @@ class Mage_Sales_Model_Resource_Report_Bestsellers extends Mage_Sales_Model_Reso
                 'period'                         => 'period',
                 'store_id'                       => new Zend_Db_Expr(Mage_Core_Model_App::ADMIN_STORE_ID),
                 'product_id'                     => 'product_id',
+                'product_sku'                    => new Zend_Db_Expr('MIN(product_sku)'),
                 'product_name'                   => new Zend_Db_Expr('MIN(product_name)'),
                 'product_price'                  => new Zend_Db_Expr('MIN(product_price)'),
                 'qty_ordered'                    => new Zend_Db_Expr('SUM(qty_ordered)'),

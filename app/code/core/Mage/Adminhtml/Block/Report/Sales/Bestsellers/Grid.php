@@ -59,6 +59,13 @@ class Mage_Adminhtml_Block_Report_Sales_Bestsellers_Grid extends Mage_Adminhtml_
             'html_decorators' => array('nobr'),
         ));
 
+        $this->addColumn('product_sku', array(
+            'header'    => Mage::helper('reports')->__('Product SKU'),
+            'index'     => 'product_sku',
+            'type'      => 'string',
+            'sortable'  => false,
+        ));
+
         $this->addColumn('product_name', array(
             'header'    => Mage::helper('sales')->__('Product Name'),
             'index'     => 'product_name',

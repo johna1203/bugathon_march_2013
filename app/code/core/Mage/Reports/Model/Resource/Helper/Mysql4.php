@@ -80,6 +80,7 @@ class Mage_Reports_Model_Resource_Helper_Mysql4 extends Mage_Core_Model_Resource
             'period'        => 't.period',
             'store_id'      => 't.store_id',
             'product_id'    => 't.product_id',
+            'product_sku'   => 't.product_sku',
             'product_name'  => 't.product_name',
             'product_price' => 't.product_price',
         );

@@ -80,6 +80,7 @@ class Mage_Sales_Model_Resource_Report_Bestsellers_Collection
                     'period'         =>  sprintf('MAX(%s)', $adapter->getDateFormatSql('period', '%Y-%m-%d')),
                     'qty_ordered'    => 'SUM(qty_ordered)',
                     'product_id'     => 'product_id',
+                    'product_sku'    => 'MAX(product_sku)',
                     'product_name'   => 'MAX(product_name)',
                     'product_price'  => 'MAX(product_price)',
                 );
