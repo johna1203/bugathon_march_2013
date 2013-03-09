@@ -627,7 +627,7 @@ class Mage_Core_Model_Email_Template extends Mage_Core_Model_Template
             Mage::throwException(Mage::helper('core')->__('The template Name must not be empty.'));
         }
         if($this->_getResource()->checkCodeUsage($this)) {
-            Mage::throwException(Mage::helper('core')->__('Duplicate Of Template Name'));
+            Mage::throwException(Mage::helper('core')->__('A Template with this Name already exists for specified store.'));
         }
         return parent::_beforeSave();
     }

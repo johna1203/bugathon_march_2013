@@ -65,14 +65,15 @@ class Mage_Adminhtml_Block_System_Email_Template_Edit_Form extends Mage_Adminhtm
             'class' => 'fieldset-wide'
         ));
 
-        $templateId = $this->getEmailTemplate()->getId();
+        $template = $this->getEmailTemplate();
+        $templateId = $template->getId();
         if ($templateId) {
             $fieldset->addField('used_currently_for', 'label', array(
                 'label' => Mage::helper('adminhtml')->__('Used Currently For'),
                 'container_id' => 'used_currently_for',
                 'after_element_html' =>
                     '<script type="text/javascript">' .
-                    (!$this->getEmailTemplate()->getSystemConfigPathsWhereUsedCurrently()
+                    (!$template->getSystemConfigPathsWhereUsedCurrently()
                         ? '$(\'' . 'used_currently_for' . '\').hide(); ' : '') .
                     '</script>',
             ));
@@ -84,7 +85,7 @@ class Mage_Adminhtml_Block_System_Email_Template_Edit_Form extends Mage_Adminhtm
                 'container_id' => 'used_default_for',
                 'after_element_html' =>
                     '<script type="text/javascript">' .
-                    (!(bool)$this->getEmailTemplate()->getOrigTemplateCode()
+                    (!(bool)$template->getOrigTemplateCode()
                         ? '$(\'' . 'used_default_for' . '\').hide(); ' : '') .
                     '</script>',
             ));
@@ -102,6 +103,28 @@ class Mage_Adminhtml_Block_System_Email_Template_Edit_Form extends Mage_Adminhtm
             'label' => Mage::helper('adminhtml')->__('Template Subject'),
             'required' => true
         ));
+
+        /**
+         * Check is single store mode
+         */
+        if (!Mage::app()->isSingleStoreMode()) {
+            $field = $fieldset->addField('store_id', 'multiselect', array(
+                'name'      => 'stores[]',
+                'label'     => Mage::helper('core')->__('Store View'),
+                'title'     => Mage::helper('core')->__('Store View'),
+                'required'  => true,
+                'values'    => Mage::getSingleton('adminhtml/system_store')->getStoreValuesForForm(false, true),
+            ));
+            $renderer = $this->getLayout()->createBlock('adminhtml/store_switcher_form_renderer_fieldset_element');
+            $field->setRenderer($renderer);
+        }
+        else {
+            $fieldset->addField('store_id', 'hidden', array(
+                'name'      => 'stores[]',
+                'value'     => Mage::app()->getStore(true)->getId()
+            ));
+            $template->setStoreId(Mage::app()->getStore(true)->getId());
+        }
 
         $fieldset->addField('orig_template_variables', 'hidden', array(
             'name' => 'orig_template_variables',
@@ -135,7 +158,7 @@ class Mage_Adminhtml_Block_System_Email_Template_Edit_Form extends Mage_Adminhtm
             'style' => 'height:24em;',
         ));
 
-        if (!$this->getEmailTemplate()->isPlain()) {
+        if (!$template->isPlain()) {
             $fieldset->addField('template_styles', 'textarea', array(
                 'name'=>'template_styles',
                 'label' => Mage::helper('adminhtml')->__('Template Styles'),
@@ -144,7 +167,7 @@ class Mage_Adminhtml_Block_System_Email_Template_Edit_Form extends Mage_Adminhtm
         }
 
         if ($templateId) {
-            $form->addValues($this->getEmailTemplate()->getData());
+            $form->addValues($template->getData());
         }
 
         if ($values = Mage::getSingleton('adminhtml/session')->getData('email_template_form_data', true)) {

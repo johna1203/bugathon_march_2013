@@ -44,17 +44,113 @@ class Mage_Core_Model_Resource_Email_Template extends Mage_Core_Model_Resource_D
     }
 
     /**
+     * Process template data before deleting
+     *
+     * @param Mage_Core_Model_Abstract $object
+     * @return Mage_Core_Model_Resource_Email_Template
+     */
+    protected function _beforeDelete(Mage_Core_Model_Abstract $object)
+    {
+        $condition = array(
+            'template_id = ?' => (int) $object->getId(),
+        );
+
+        $this->_getWriteAdapter()->delete($this->getTable('core/email_template_store'), $condition);
+
+        return parent::_beforeDelete($object);
+    }
+
+    /**
+     * Assign email template to store views
+     *
+     * @param Mage_Core_Model_Abstract $object
+     * @return Mage_Core_Model_Resource_Email_Template
+     */
+    protected function _afterSave(Mage_Core_Model_Abstract $object)
+    {
+        $oldStores = $this->lookupStoreIds($object->getId());
+        $newStores = (array) $object->getStores();
+        if (empty($newStores)) {
+            $newStores = (array) $object->getStoreId();
+        }
+        $table  = $this->getTable('core/email_template_store');
+        $insert = array_diff($newStores, $oldStores);
+        $delete = array_diff($oldStores, $newStores);
+
+        if ($delete) {
+            $where = array(
+                'template_id = ?' => (int) $object->getId(),
+                'store_id IN (?)' => $delete
+            );
+
+            $this->_getWriteAdapter()->delete($table, $where);
+        }
+
+        if ($insert) {
+            $data = array();
+
+            foreach ($insert as $storeId) {
+                $data[] = array(
+                    'template_id' => (int) $object->getId(),
+                    'store_id' => (int) $storeId
+                );
+            }
+
+            $this->_getWriteAdapter()->insertMultiple($table, $data);
+        }
+
+        return parent::_afterSave($object);
+    }
+
+    /**
+     * Perform operations after object load
+     *
+     * @param Mage_Core_Model_Abstract $object
+     * @return Mage_Core_Model_Resource_Email_Template
+     */
+    protected function _afterLoad(Mage_Core_Model_Abstract $object)
+    {
+        if ($object->getId()) {
+            $stores = $this->lookupStoreIds($object->getId());
+
+            $object->setData('store_id', $stores);
+        }
+
+        return parent::_afterLoad($object);
+    }
+
+    /**
+     * Retrieve load select with filter by template code and store.
+     *
+     * @param string $templateCode
+     * @param int|array $store
+     * @return Varien_Db_Select
+     */
+    protected function _getLoadByCodeSelect($templateCode, $store)
+    {
+        $select = $this->_getReadAdapter()->select()
+            ->from(array('t' => $this->getMainTable()))
+            ->join(
+                array('ts' => $this->getTable('core/email_template_store')),
+                't.template_id = ts.template_id',
+                array())
+            ->where('t.template_code = ?', $templateCode)
+            ->where('ts.store_id IN (?)', $store);
+
+        return $select;
+    }
+
+    /**
      * Load by template code from DB.
      *
      * @param string $templateCode
+     * @param int|array $store
      * @return array
      */
-    public function loadByCode($templateCode)
+    public function loadByCode($templateCode, $store = Mage_Core_Model_App::ADMIN_STORE_ID)
     {
-        $select = $this->_getReadAdapter()->select()
-            ->from($this->getMainTable())
-            ->where('template_code = :template_code');
-        $result = $this->_getReadAdapter()->fetchRow($select, array('template_code' => $templateCode));
+        $select = $this->_getLoadByCodeSelect($templateCode, $store);
+        $result = $this->_getReadAdapter()->fetchRow($select);
 
         if (!$result) {
             return array();
@@ -71,25 +167,42 @@ class Mage_Core_Model_Resource_Email_Template extends Mage_Core_Model_Resource_D
     public function checkCodeUsage(Mage_Core_Model_Email_Template $template)
     {
         if ($template->getTemplateActual() != 0 || is_null($template->getTemplateActual())) {
-            $select = $this->_getReadAdapter()->select()
-                ->from($this->getMainTable(), 'COUNT(*)')
-                ->where('template_code = :template_code');
-            $bind = array(
-                'template_code' => $template->getTemplateCode()
-            );
+
+            if (Mage::app()->isSingleStoreMode() || !$template->hasStores()) {
+                $stores = array(Mage_Core_Model_App::ADMIN_STORE_ID);
+            } else {
+                $stores = (array) $template->getData('stores');
+            }
+
+            $select = $this->_getLoadByCodeSelect($template->getData('template_code'), $stores);
 
             $templateId = $template->getId();
             if ($templateId) {
-                $select->where('template_id != :template_id');
-                $bind['template_id'] = $templateId;
+                $select->where('t.template_id != ?', $template->getId());
             }
 
-            $result = $this->_getReadAdapter()->fetchOne($select, $bind);
-            if ($result) {
+            if ($this->_getWriteAdapter()->fetchRow($select)) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Get store ids to which specified item is assigned
+     *
+     * @param int $templateId
+     * @return array
+     */
+    public function lookupStoreIds($templateId)
+    {
+        $adapter = $this->_getReadAdapter();
+
+        $select  = $adapter->select()
+            ->from($this->getTable('core/email_template_store'), 'store_id')
+            ->where('template_id = ?',(int)$templateId);
+
+        return $adapter->fetchCol($select);
     }
 
     /**
