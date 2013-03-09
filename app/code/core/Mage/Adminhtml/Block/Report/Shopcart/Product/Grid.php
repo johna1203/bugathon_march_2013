@@ -59,6 +59,11 @@ class Mage_Adminhtml_Block_Report_Shopcart_Product_Grid extends Mage_Adminhtml_B
             'index'     =>'entity_id'
         ));
 
+        $this->addColumn('sku', array(
+            'header'    => Mage::helper('reports')->__('Product SKU'),
+            'index'     => 'sku',
+        ));
+
         $this->addColumn('name', array(
             'header'    =>Mage::helper('reports')->__('Product Name'),
             'index'     =>'name'

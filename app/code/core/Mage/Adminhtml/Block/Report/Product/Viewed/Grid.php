@@ -74,6 +74,13 @@ class Mage_Adminhtml_Block_Report_Product_Viewed_Grid extends Mage_Adminhtml_Blo
             'html_decorators' => array('nobr'),
         ));
 
+        $this->addColumn('product_sku', array(
+            'header'    => Mage::helper('reports')->__('Product SKU'),
+            'index'     => 'product_sku',
+            'type'      => 'string',
+            'sortable'  => false,
+        ));
+
         $this->addColumn('product_name', array(
             'header'    => Mage::helper('adminhtml')->__('Product Name'),
             'index'     => 'product_name',
