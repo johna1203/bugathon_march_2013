@@ -1223,6 +1223,7 @@ class Mage_Eav_Model_Entity_Setup extends Mage_Core_Model_Resource_Setup
                     'identity'  => true,
                     'nullable'  => false,
                     'primary'   => true,
+                    'unsigned'  => true,
                  ), 'Entity Id')
                 ->addColumn('entity_type_id', Varien_Db_Ddl_Table::TYPE_SMALLINT, null, array(
                     'unsigned'  => true,
@@ -1302,6 +1303,7 @@ class Mage_Eav_Model_Entity_Setup extends Mage_Core_Model_Resource_Setup
                     'identity'  => true,
                     'nullable'  => false,
                     'primary'   => true,
+                    'unsigned'  => true,
                     ), 'Value Id')
                 ->addColumn('entity_type_id', Varien_Db_Ddl_Table::TYPE_SMALLINT, null, array(
                     'unsigned'  => true,
