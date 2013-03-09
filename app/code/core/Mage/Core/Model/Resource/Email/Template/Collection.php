@@ -64,43 +64,6 @@ class Mage_Core_Model_Resource_Email_Template_Collection extends  Mage_Core_Mode
     }
 
     /**
-     * Perform operations after collection load
-     *
-     * @return Mage_Cms_Model_Resource_Page_Collection
-     */
-    protected function _afterLoad()
-    {
-        if ($this->_previewFlag) {
-            $items = $this->getColumnValues('template_id');
-            $connection = $this->getConnection();
-            if (count($items)) {
-                $select = $connection->select()
-                        ->from(array('cps'=>$this->getTable('core/email_template_store')))
-                        ->where('cps.template_id IN (?)', $items);
-
-                if ($result = $connection->fetchPairs($select)) {
-                    foreach ($this as $item) {
-                        if (!isset($result[$item->getData('template_id')])) {
-                            continue;
-                        }
-                        if ($result[$item->getData('template_id')] == 0) {
-                            $stores = Mage::app()->getStores(false, true);
-                            $storeId = current($stores)->getId();
-                            $storeCode = key($stores);
-                        } else {
-                            $storeId = $result[$item->getData('template_id')];
-                            $storeCode = Mage::app()->getStore($storeId)->getCode();
-                        }
-                        $item->setData('_first_store_id', $storeId);
-                        $item->setData('store_code', $storeCode);
-                    }
-                }
-            }
-        }
-
-        return parent::_afterLoad();
-    }
-    /**
      * Join store relation table if there is store filter
      */
     protected function _renderFiltersBefore()
