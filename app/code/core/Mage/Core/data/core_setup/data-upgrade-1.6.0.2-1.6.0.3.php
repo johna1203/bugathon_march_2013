@@ -65,7 +65,7 @@ $templateMap = array();
 foreach ($configs as $config) {
 
     if (is_numeric($config['value'])) {
-        
+
         if (!isset($templateMap[$config['value']])) {
             $templateMap[$config['value']] = array();
         }
@@ -85,31 +85,16 @@ foreach ($templates as $template) {
         $i = 0;
         foreach ($templateMap[$template['template_id']] as $config) {
 
+            $template['template_code'] = $configValuesMap[$config['path']];
             if ($i > 0) {
-
-                $template['template_code'] = $configValuesMap[$config['path']];
                 unset($template['template_id']);
-
-                $installer->getConnection()->insert(
-                    $installer->getTable('core/email_template'),
-                    $template
-                );
-
                 $template['template_id'] = $installer->getConnection()->lastInsertId();
-
-            } else {
-                $installer->getConnection()->update(
-                    $installer->getTable('core/email_template'),
-                    array(
-                        'template_code' => $configValuesMap[$config['path']],
-                    )
-                );
             }
 
             $stores = array();
-            if ($config['scope'] === 'store') {
+            if ($config['scope'] === 'stores') {
                 $stores[] = $config['scope_id'];
-            } else if ($config['scope'] === 'website') {
+            } else if ($config['scope'] === 'websites') {
                 $website = Mage::getModel('core/website')->load($config['scope_id']);
                 foreach ($website->getGroups() as $group) {
                     foreach ($group->getStores() as $store) {
@@ -121,15 +106,13 @@ foreach ($templates as $template) {
             }
 
             foreach ($stores as $store) {
-
                 try {
-
                     $model = Mage::getModel('core/email_template')->load($template['template_id']);
                     $storeId = $model->getStoreId();
 
-                    $storeId[] = $store;
+                    $template['stores'][] = $store;
 
-                    $model->setStores($storeId);
+                    $model->setData($template);
                     $model->save();
 
                 } catch (Mage_Core_Exception $e) {
