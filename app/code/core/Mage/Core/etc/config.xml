@@ -28,7 +28,7 @@
 <config>
     <modules>
         <Mage_Core>
-            <version>1.6.0.2</version>
+            <version>1.6.0.3</version>
         </Mage_Core>
     </modules>
     <global>
@@ -53,6 +53,9 @@
                     <email_template>
                         <table>core_email_template</table>
                     </email_template>
+                    <email_template_store>
+                        <table>core_email_template_store</table>
+                    </email_template_store>
                     <variable>
                         <table>core_variable</table>
                     </variable>
