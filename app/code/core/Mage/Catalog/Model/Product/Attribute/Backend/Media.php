@@ -139,7 +139,9 @@ class Mage_Catalog_Model_Product_Attribute_Backend_Media extends Mage_Eav_Model_
                     continue;
                 }
                 $duplicate[$image['value_id']] = $this->_copyImage($image['file']);
-                $newImages[$image['file']] = $duplicate[$image['value_id']];
+                $newImages[$image['file']] = array();
+                $newImages[$image['file']]['new_file'] = $duplicate[$image['value_id']];
+                $newImages[$image['file']]['label'] = $image['label'];
             }
 
             $value['duplicate'] = $duplicate;
