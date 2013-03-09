@@ -198,12 +198,12 @@ class Mage_CatalogInventory_Model_Stock extends Mage_Core_Model_Abstract
      * @param numeric $qty
      * @return Mage_CatalogInventory_Model_Stock
      */
-    public function backItemQty($productId, $qty)
+    public function backItemQty($productId, $qty, $storeId = null)
     {
         $stockItem = Mage::getModel('cataloginventory/stock_item')->loadByProduct($productId);
         if ($stockItem->getId() && Mage::helper('catalogInventory')->isQty($stockItem->getTypeId())) {
             $stockItem->addQty($qty);
-            if ($stockItem->getCanBackInStock() && $stockItem->getQty() > $stockItem->getMinQty()) {
+            if ($stockItem->getCanBackInStock($storeId) && $stockItem->getQty() > $stockItem->getMinQty()) {
                 $stockItem->setIsInStock(true)
                     ->setStockStatusChangedAutomaticallyFlag(true);
             }
