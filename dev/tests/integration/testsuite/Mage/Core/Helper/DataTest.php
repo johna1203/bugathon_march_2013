@@ -136,7 +136,7 @@ class Mage_Core_Helper_DataTest extends PHPUnit_Framework_TestCase
     public function testRemoveAccentsGerman() {
 
         $umlauts = 'äöüÄÖÜ';
-        $this->assertEquals($this->_helper->removeAccents($umlauts, true), 'aeoeueAeOeUe');
+        $this->assertEquals('aeoeueAeOeUe', $this->_helper->removeAccents($umlauts, true));
     }
 
     /**
