@@ -32,11 +32,30 @@ system_email_template:
     click_xpath: //div[@class='nav-bar']//a[normalize-space(span)='Transactional Emails']
     title: Transactional Emails / System / Magento Admin
     uimap:
+        form: &searchTemplateForm
+            fieldsets:
+                -
+                    search_template_form:
+                        xpath: //table[@id='systemEmailTemplateGrid_table']//thead
+                        fields:
+                            template_id: //input[@name='template_id']
+                            code: //input[@name='code']
+                            added_at: //input[@name='added_at']
+                            modified_at: //input[@name='modified_at']
+                            subject: //input[@name='subject']
+                        dropdowns:
+                            type: //select[@name='type']
+                            store_id: //select[@name='store_id']
+
         buttons:
-            add_new_template: //button[span='Add New Template' or span='Add New']
+            add_new_template: //button[span='Add New Template']
+            reset_filter: //button[span='Reset Filter']
 
         messages: &templateMessages
             success_saved_template: //li[normalize-space(@class)='success-msg' and contains(.,'The email template has been saved.')]
+            success_deleted_template: //li[normalize-space(@class)='success-msg' and contains(.,'The email template has been deleted.')]
+            error_duplicated_template: //li[normalize-space(@class)='error-msg' and contains(.,'A Template with this Name already exists for specified store.')]
+            confirmation_for_delete_template: Are you sure that you want to delete this template?
 
 # 'New Template' Page
 create_template:
@@ -63,9 +82,29 @@ create_template:
                         multiselects:
                             store_view: //select[@name='stores[]']
 
-        buttons:
+        buttons: &newTemplateFormButtons
             back: //button[span='Back']
             reset: //button[span='Reset']
+            delete_template: //button[span='Delete Template']
             save_template: //button[span='Save Template']
 
         messages: *templateMessages
+
+# 'Edit Template' Page
+edit_template:
+    mca: system_email_template/edit/id/%id%
+    title: %elementTitle% / Transactional Emails / System / Magento Admin
+    uimap:
+        form: *newTemplateForm
+
+        buttons: *newTemplateFormButtons
+
+        messages: *templateMessages
+
+# 'New Template' Page
+save_template:
+    mca: system_email_template/save
+    title: New Template / Transactional Emails / System / Magento Admin
+    uimap:
+        messages: *templateMessages
+

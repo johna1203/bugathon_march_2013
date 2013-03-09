@@ -70,5 +70,34 @@ class Core_Mage_Email_EmailTest extends Mage_Selenium_TestCase
         $data = $this->loadDataSet('Email', 'create_new_transactional_email');
         $this->emailHelper()->createTemplate($data);
         $this->assertMessagePresent('success', 'success_saved_template');
+
+        return $data;
+    }
+
+    /**
+     *
+     * @param array $data
+     * @test
+     * @depends createTransactionalEmail
+     */
+    public function createDuplicateEmail($data)
+    {
+        $this->emailHelper()->createTemplate($data);
+        $this->assertMessagePresent('error', 'error_duplicated_template');
+    }
+
+    /**
+     *
+     * @param array $data
+     * @test
+     * @depends createTransactionalEmail
+     */
+    public function deleteEmail($data)
+    {
+        $this->addParameter('elementTitle', $data['template_code']);
+        $this->searchAndOpen(array('code' => $data['template_code']));
+        $this->clickControlAndConfirm('button', 'delete_template', 'confirmation_for_delete_template');
+
+        $this->assertMessagePresent('success', 'success_deleted_template');
     }
 }
