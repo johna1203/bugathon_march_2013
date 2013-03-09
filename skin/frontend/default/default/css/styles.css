@@ -625,6 +625,7 @@ tr.summary-details-excluded { font-style:italic; }
 .block-compare,
 .block-reorder,
 .block-poll,
+.block-gr-search,
 .block-viewed,
 .block-compared,
 .block-related,
@@ -745,6 +746,10 @@ tr.summary-details-excluded { font-style:italic; }
 .block-poll button.button span { border-color:#406a83; background:#618499; }
 .block-poll .answer { font-weight:bold; }
 .block-poll .votes { float:right; margin-left:10px; }
+
+/* Block: Orders and Returns */
+.block-gr-search li { padding:3px 9px; }
+.block-gr-search button.button span { border-color:#406a83; background:#618499; }
 
 /* Block: Tags */
 .block-tags .block-title strong { background-image:url(../images/i_block-tags.gif); }
