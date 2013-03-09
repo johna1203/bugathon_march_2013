@@ -335,7 +335,7 @@ class Mage_Adminhtml_Model_Config_Data extends Varien_Object
         if (is_null($configData)) {
             $configData = $this->_configData;
         }
-        if (isset($configData[$path])) {
+        if (array_key_exists($path, $configData)) {
             $data = $configData[$path];
             $inherit = false;
         } else {
