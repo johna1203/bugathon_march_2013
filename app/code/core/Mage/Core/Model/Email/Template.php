@@ -454,7 +454,7 @@ class Mage_Core_Model_Email_Template extends Mage_Core_Model_Template
             Mage::dispatchEvent('core_email_template_send_before', array(
                 'mail' => $mail,
                 'name' => $name,
-                'recipient_emails' => $email,
+                'recipient_emails' => $emails,
                 'template' => $this,
                 'variables' => $variables,
             ));
