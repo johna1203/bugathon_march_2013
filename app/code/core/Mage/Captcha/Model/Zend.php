@@ -405,6 +405,11 @@ class Mage_Captcha_Model_Zend extends Zend_Captcha_Image implements Mage_Captcha
      */
     protected function _isShowAlways()
     {
+        // setting the allowed attempts to 0 is like setting mode to always
+        if($this->_getAllowedAttemptsForSameLogin() == 0 || $this->_getAllowedAttemptsFromSameIp() == 0) {
+            return true;
+        }
+
         if ((string)$this->_getHelper()->getConfigNode('mode') == Mage_Captcha_Helper_Data::MODE_ALWAYS) {
             return true;
         }
