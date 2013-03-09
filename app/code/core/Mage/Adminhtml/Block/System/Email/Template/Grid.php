@@ -112,6 +112,20 @@ class Mage_Adminhtml_Block_System_Email_Template_Grid extends Mage_Adminhtml_Blo
                 'width'		=> '100px',
                 'renderer'  => 'adminhtml/system_email_template_grid_renderer_action'
         ));
+
+        if (!Mage::app()->isSingleStoreMode()) {
+            $this->addColumn('store_id', array(
+                'header'        => Mage::helper('cms')->__('Store View'),
+                'index'         => 'store_id',
+                'type'          => 'store',
+                'store_all'     => true,
+                'store_view'    => true,
+                'sortable'      => false,
+                'filter_condition_callback'
+                                => array($this, '_filterStoreCondition'),
+            ));
+        }
+
         return $this;
     }
 
@@ -120,5 +134,18 @@ class Mage_Adminhtml_Block_System_Email_Template_Grid extends Mage_Adminhtml_Blo
         return $this->getUrl('*/*/edit', array('id'=>$row->getId()));
     }
 
-}
+    protected function _filterStoreCondition($collection, $column)
+    {
+        if (!$value = $column->getFilter()->getValue()) {
+            return;
+        }
 
+        $this->getCollection()->addStoreFilter($value);
+    }
+
+    protected function _afterLoadCollection()
+    {
+        $this->getCollection()->walk('afterLoad');
+        parent::_afterLoadCollection();
+    }
+}
