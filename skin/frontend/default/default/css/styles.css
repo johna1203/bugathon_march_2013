@@ -189,11 +189,11 @@ input.input-text:focus,select:focus,textarea:focus { background-color:#edf7fd; }
 .form-list li.additional-row .btn-remove { float:right; margin:5px 0 0; }
 .form-list .input-range input.input-text { width:74px; }
 
-.form-list-narrow li  { margin-bottom:0; } 
+.form-list-narrow li  { margin-bottom:0; }
 .form-list-narrow li .input-box { margin-bottom:6px; }
-.form-list-narrow li.wide .input-box { width:260px; } 
-.form-list-narrow li.wide input.input-text, 
-.form-list-narrow li.wide textarea { width:254px } 
+.form-list-narrow li.wide .input-box { width:260px; }
+.form-list-narrow li.wide input.input-text,
+.form-list-narrow li.wide textarea { width:254px }
 .form-list-narrow li.wide select { width:260px; }
 
 /* Customer */
@@ -233,16 +233,19 @@ input.input-text:focus,select:focus,textarea:focus { background-color:#edf7fd; }
 .form-list .customer-name-prefix-suffix .name-lastname input.input-text { width:189px; }
 
 .form-list .customer-name-prefix .name-firstname,
-.form-list .customer-name-middlename .name-firstname { width:210px; }
+.form-list .customer-name-middlename .name-firstname,
+.form-list .customer-name-middlename .name-middlename { width:210px; }
 
 .form-list .customer-name-suffix .name-lastname,
 .form-list .customer-name-middlename .name-firstname,
+.form-list .customer-name-middlename .name-middlename,
 .form-list .customer-name-middlename-suffix .name-firstname,
 .form-list .customer-name-middlename-suffix .name-lastname { width:205px; }
 
 .form-list .customer-name-prefix .name-firstname input.input-text,
 .form-list .customer-name-suffix .name-lastname input.input-text,
 .form-list .customer-name-middlename .name-firstname input.input-text,
+.form-list .customer-name-middlename .name-middlename input.input-text,
 .form-list .customer-name-middlename-suffix .name-firstname input.input-text,
 .form-list .customer-name-middlename-suffix .name-lastname input.input-text { width:189px; }
 
