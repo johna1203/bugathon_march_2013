@@ -110,6 +110,30 @@ abstract class Mage_Eav_Model_Entity_Attribute_Source_Abstract
      * @return Mage_Eav_Model_Entity_Attribute_Source_Abstract
      */
     public function addValueSortToCollection($collection, $dir = Varien_Data_Collection::SORT_ORDER_DESC) {
+        $valueTable1    = $this->getAttribute()->getAttributeCode() . '_t1';
+        $valueTable2    = $this->getAttribute()->getAttributeCode() . '_t2';
+
+        $valueExpr = $collection->getSelect()->getAdapter()
+            ->getCheckSql("{$valueTable2}.value_id > 0", "{$valueTable2}.value", "{$valueTable1}.value");
+
+        $collection->getSelect()
+            ->joinLeft(
+                array($valueTable1 => $this->getAttribute()->getBackend()->getTable()),
+                "e.entity_id={$valueTable1}.entity_id"
+                . " AND {$valueTable1}.attribute_id='{$this->getAttribute()->getId()}'"
+                . " AND {$valueTable1}.store_id=0",
+                array())
+            ->joinLeft(
+                array($valueTable2 => $this->getAttribute()->getBackend()->getTable()),
+                "e.entity_id={$valueTable2}.entity_id"
+                . " AND {$valueTable2}.attribute_id='{$this->getAttribute()->getId()}'"
+                . " AND {$valueTable2}.store_id='{$collection->getStoreId()}'",
+                array($this->getAttribute()->getAttributeCode() => $valueExpr)
+            );
+
+        $collection->getSelect()
+            ->order("{$this->getAttribute()->getAttributeCode()} {$dir}");
+
         return $this;
     }
 
