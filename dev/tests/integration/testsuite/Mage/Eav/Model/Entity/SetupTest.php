@@ -10,7 +10,7 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    protected static $_config = array(
+    protected static $_fixture = array(
         'classGroup' => 'phpunit_test_createEntityTables',
         'tableName' => 'phpunit_test_create_entity_tables_tmp',
         'entityName' => 'test',
@@ -18,18 +18,21 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
 
     /**
      * Setup config fixtures and drop test tables if they exist
+     *
+     * Unable to use @magentoConfigFixture here because the config
+     * path isn't hardcoded
      */
     public static function setUpBeforeClass()
     {
         // Set up config fixtures
         $config = Mage::getConfig();
         $config->setNode(
-            "global/models/" . self::$_config['classGroup'] . "/resourceModel",
-                self::$_config['classGroup'] . "_resource"
+            "global/models/" . self::$_fixture['classGroup'] . "/resourceModel",
+                self::$_fixture['classGroup'] . "_resource"
         );
         $config->setNode(
-            "global/models/" . self::$_config['classGroup'] . "_resource/entities/" . self::$_config['entityName'] . "/table",
-            self::$_config['tableName']
+            "global/models/" . self::$_fixture['classGroup'] . "_resource/entities/" . self::$_fixture['entityName'] . "/table",
+            self::$_fixture['tableName']
         );
 
         self::dropTestTables();
@@ -71,7 +74,7 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
      */
     protected function getTableAlias()
     {
-        return $tableAlias = self::$_config['classGroup'] . '/' . self::$_config['entityName'];
+        return $tableAlias = self::$_fixture['classGroup'] . '/' . self::$_fixture['entityName'];
     }
 
     /**
@@ -83,12 +86,12 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
         // First drop the value tables because of the FK constraints to the entity table
         /** @var $con Varien_Db_Adapter_Pdo_Mysql */
         $con = Mage::getSingleton('core/resource')->getConnection('eav_write');
-        $sql = "SHOW TABLES LIKE '" . self::$_config['tableName'] . "_%'";
+        $sql = "SHOW TABLES LIKE '" . self::$_fixture['tableName'] . "_%'";
         foreach ($con->fetchCol($sql) as $table) {
             $con->dropTable($table);
         }
         // Finally drop the entity table
-        $sql = "SHOW TABLES LIKE '" . self::$_config['tableName'] . "'";
+        $sql = "SHOW TABLES LIKE '" . self::$_fixture['tableName'] . "'";
         foreach ($con->fetchCol($sql) as $table) {
             $con->dropTable($table);
         }
@@ -100,7 +103,7 @@ class Mage_Eav_Model_Entity_SetupTest extends PHPUnit_Framework_TestCase
     public function assertPreConditions()
     {
         $result = Mage::getSingleton('core/resource')->getTableName($this->getTableAlias());
-        $this->assertEquals(self::$_config['tableName'], $result);
+        $this->assertEquals(self::$_fixture['tableName'], $result);
     }
 
     /**
