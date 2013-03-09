@@ -2,10 +2,17 @@
 
 /**
  * @group module:Mage_Catalog
+ * @magentoDataFixture Mage/Catalog/_files/product_large_configurables.php
  */
 class Mage_Catalog_Model_Resource_Product_Configurable_CollectionTest
     extends PHPUnit_Framework_TestCase
 {
+    /**
+     * These values should match the settings in the fixture
+     * Mage/Catalog/_files/product_large_configurables.php
+     *
+     * @return array
+     */
     public function productCollectionDataProvider()
     {
         $numConfigurables = 16;
@@ -18,14 +25,13 @@ class Mage_Catalog_Model_Resource_Product_Configurable_CollectionTest
 
     /**
      * @test
-     * @magentoDataFixture Mage/Catalog/_files/product_large_configurables.php
      * @dataProvider productCollectionDataProvider
      */
     public function loadProductCollection($numConfigurables, $numActiveAssociatedSimples)
     {
         $collection = new Mage_Catalog_Model_Resource_Product_Collection();
         $collection->addFieldToFilter('type_id', Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE)
-            ->addStoreId(Mage::app()->getDefaultStoreView()->getId());
+            ->setStoreId(Mage::app()->getDefaultStoreView()->getId());
 
         $this->assertEquals(
             $numConfigurables, $collection->count(),
@@ -42,23 +48,29 @@ class Mage_Catalog_Model_Resource_Product_Configurable_CollectionTest
         }
     }
 
-    public function loadProductCollectionWithFlagIsFaster()
+    /**
+     * @test
+     */
+    public function loadTimeIsFasterForProductCollectionWithFlagThenWithoutFlag()
     {
         $collectionWithoutFlag = new Mage_Catalog_Model_Resource_Product_Collection();
         $collectionWithoutFlag->addFieldToFilter('type_id', Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE);
-        $collectionWithoutFlag->addStoreId(Mage::app()->getDefaultStoreView()->getId());
+        $collectionWithoutFlag->setStoreId(Mage::app()->getDefaultStoreView()->getId());
 
         $collectionWithFlag = clone $collectionWithoutFlag;
-
         $collectionWithFlag->setFlag('load_associated_products', true);
-        $startWithFlagLoad = microtime(true);
+
+        $withFlagLoadStart = microtime(true);
         $collectionWithFlag->load();
-        $withFlagLoadTime = microtime(true) - $startWithFlagLoad;
+        $withFlagLoadTime = microtime(true) - $withFlagLoadStart;
 
-        $startWithoutFlagLoad = microtime(true);
+        $withoutFlagLoadStart = microtime(true);
         $collectionWithoutFlag->load();
-        $collectionWithoutFlag= microtime(true) - $startWithoutFlagLoad;
+        $withoutLoadTime= microtime(true) - $withoutFlagLoadStart;
 
-        $this->assertLessThan()
+        $this->assertLessThan(
+            $withoutLoadTime, $withFlagLoadTime,
+            "Collection load time with set flag ($withFlagLoadTime) is not slower then load time without the flag ($withoutLoadTime)"
+        );
     }
 }
