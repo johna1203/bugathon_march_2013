@@ -379,8 +379,45 @@ class Mage_Sales_Model_Order_Item extends Mage_Core_Model_Abstract
      */
     public function getQtyToCancel()
     {
-        $qtyToCancel = min($this->getQtyToInvoice(), $this->getQtyToShip());
+        
+        if ($this->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {
+            $qtyToCancel = $this->getQtyToCancelBundle();
+        } elseif ($this->getParentItem() && $this->getParentItem()->getProductType() == Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {
+            $qtyToCancel = $this->getQtyToCancelBundleItem();
+        } else {
+            $qtyToCancel = min($this->getQtyToInvoice(), $this->getQtyToShip());
+        }
+
         return max($qtyToCancel, 0);
+    }
+    
+    /**
+     * Retrieve Bundle item qty available for cancel
+     *
+     * @return float|integer
+     */
+    public function getQtyToCancelBundle()
+    {
+        if ($this->isDummy()) {
+            $qty = $this->getQtyOrdered()
+                - $this->getQtyInvoiced()
+                - $this->getQtyCanceled();
+            return min(max($qty, 0), $this->getQtyToShip());
+        }
+        return min($this->getQtyToInvoice(), $this->getQtyToShip());
+    }
+    
+    /**
+     * Retrieve Bundel child item qty available for cancel
+     *
+     * @return float|integer
+     */
+    public function getQtyToCancelBundleItem()
+    {
+        if ($this->isDummy(true)) {
+            return min($this->getQtyToInvoice(), $this->getSimpleQtyToShip());
+        }
+        return min($this->getQtyToInvoice(), $this->getQtyToShip());
     }
 
     /**
