@@ -450,15 +450,15 @@ class Mage_Core_Model_Email_Template extends Mage_Core_Model_Template
         $mail->setSubject('=?utf-8?B?' . base64_encode($this->getProcessedTemplateSubject($variables)) . '?=');
         $mail->setFrom($this->getSenderEmail(), $this->getSenderName());
 
-        Mage::dispatchEvent('core_email_template_send_before', array(
-            'mail' => $mail,
-            'name' => $name,
-            'recipient_emails' => $email,
-            'template' => $this,
-            'variables' => $variables,
-        ));
-
         try {
+            Mage::dispatchEvent('core_email_template_send_before', array(
+                'mail' => $mail,
+                'name' => $name,
+                'recipient_emails' => $email,
+                'template' => $this,
+                'variables' => $variables,
+            ));
+
             $mail->send();
             $this->_mail = null;
         }
