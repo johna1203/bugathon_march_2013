@@ -212,6 +212,13 @@ table.actions td                { vertical-align:top; }
 .grid select.select-export-filter,
 .grid select.multiselect-export-filter { width:278px; }
 
+.omnisearch input.omnisearch {
+    width: 99%;
+    height: 25px;
+    font-size: 20px;
+    padding: 5px;
+}
+
 /* Grid Footer */
 .grid table tfoot tr            { background:#D7E5EF; }
 .grid table tfoot tr td         { border-top:1px solid #9babb9; background:#e5ecf2; line-height:1.7em; }

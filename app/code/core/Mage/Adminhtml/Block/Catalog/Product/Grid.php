@@ -44,6 +44,9 @@ class Mage_Adminhtml_Block_Catalog_Product_Grid extends Mage_Adminhtml_Block_Wid
         $this->setUseAjax(true);
         $this->setVarNameFilter('product_filter');
 
+        // TODO: I need to remove this and figure out how to get it to work purely
+        // through layout.xml
+        $this->setTemplate('catalog/product/grid.phtml');
     }
 
     protected function _getStore()
