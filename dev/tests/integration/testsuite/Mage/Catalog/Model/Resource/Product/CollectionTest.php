@@ -62,7 +62,7 @@ class Mage_Catalog_Model_Resource_Product_CollectionTest extends PHPUnit_Framewo
     {
         $this->_collection
                 ->setOrder($attributeCode, 'ASC')
-                ->load(true);
+                ->load();
         $first = $this->_collection->getFirstItem()->getData($attributeCode);
         $last  = $this->_collection->getLastItem()->getData($attributeCode);
         $this->assertLessThan($last, $first, "Sorting by custom attribute '$attributeCode' (ASC)");

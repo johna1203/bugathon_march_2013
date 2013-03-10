@@ -2,7 +2,6 @@
 
 Mage::app()->reinitStores();
 Mage::app()->setCurrentStore(Mage_Core_Model_Store::ADMIN_CODE);
-Mage::app()->getStore()->setConfig('catalog/frontend/flat_catalog_product', 1);
 Mage::app()->getStore()->setWebsiteId(1);
 
 $installer = new Mage_Catalog_Model_Resource_Setup('catalog_write');
