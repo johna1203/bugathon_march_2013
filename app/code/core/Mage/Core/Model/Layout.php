@@ -202,6 +202,12 @@ class Mage_Core_Model_Layout extends Varien_Simplexml_Config
 			}
 		}
 
+		if (isset($parent['unlessconfig']) && ($configPath = (string)$parent['unlessconfig'])) {
+			if (Mage::getStoreConfigFlag($configPath)) {
+				return;
+			}
+		}
+
         foreach ($parent as $node) {
             $attributes = $node->attributes();
             if ((bool)$attributes->ignore) {
@@ -235,6 +241,12 @@ class Mage_Core_Model_Layout extends Varien_Simplexml_Config
     {
 		if (isset($node['ifconfig']) && ($configPath = (string)$node['ifconfig'])) {
 			if (!Mage::getStoreConfigFlag($configPath)) {
+				return $this;
+			}
+		}
+
+		if (isset($node['unlessconfig']) && ($configPath = (string)$node['unlessconfig'])) {
+			if (Mage::getStoreConfigFlag($configPath)) {
 				return $this;
 			}
 		}
@@ -307,6 +319,12 @@ class Mage_Core_Model_Layout extends Varien_Simplexml_Config
                 return $this;
             }
         }
+
+		if (isset($node['unlessconfig']) && ($configPath = (string)$node['unlessconfig'])) {
+			if (Mage::getStoreConfigFlag($configPath)) {
+				return $this;
+			}
+		}
 
         $method = (string)$node['method'];
         if (!empty($node['block'])) {
