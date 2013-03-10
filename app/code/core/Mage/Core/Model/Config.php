@@ -206,7 +206,7 @@ class Mage_Core_Model_Config extends Mage_Core_Model_Config_Base
     /**
      * Get config resource model
      *
-     * @return Mage_Core_Store_Mysql4_Config
+     * @return Mage_Core_Model_Resource_Config
      */
     public function getResourceModel()
     {
@@ -635,6 +635,7 @@ class Mage_Core_Model_Config extends Mage_Core_Model_Config_Base
      */
     public function getNode($path=null, $scope='', $scopeCode=null)
     {
+
         if ($scope !== '') {
             if (('store' === $scope) || ('website' === $scope)) {
                 $scope .= 's';
@@ -665,17 +666,18 @@ class Mage_Core_Model_Config extends Mage_Core_Model_Config_Base
             }
         }
 
+
         $res = parent::getNode($path);
 
         if (!empty($path) && !$res && ($scope == 'stores' || $scope == 'websites')) {
             $parts = is_array($path) ? $path : explode('/', $path);
-            if ($parts[0] == 'stores') {
+            if ($scope == 'stores') {
                 // fallback to website level
                 $websiteScopeCode = Mage::app()->getStore($parts[1])->getWebsite()->getCode();
                 $parts[0] = 'websites';
                 $parts[1] = $websiteScopeCode;
                 $res = $this->getNode(implode('/', $parts));
-            } elseif ($parts[0] == 'websites') {
+            } elseif ($scope == 'websites') {
                 // fallback to default level
                 $parts[1] = 'default';
                 array_shift($parts);
