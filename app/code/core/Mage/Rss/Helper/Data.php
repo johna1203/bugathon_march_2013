@@ -70,7 +70,7 @@ class Mage_Rss_Helper_Data extends Mage_Core_Helper_Abstract
         Mage::getSingleton('adminhtml/url')->setNoSecret(true);
         $user = $adminSession->login($username, $password);
         //$user = Mage::getModel('admin/user')->login($username, $password);
-        if($user && $user->getId() && $user->getIsActive() == '1' && $isAllowedAdmin){
+        if($user && $user->getId() && $user->getIsActive() == '1'){
             $session->setAdmin($user);
         } else {
             $this->authFailed();
