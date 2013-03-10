@@ -416,7 +416,7 @@ class Varien_Cache_Backend_Database extends Zend_Cache_Backend implements Zend_C
             return $this->_getAdapter()->update(
                 $this->_getDataTable(),
                 array('expire_time'=>new Zend_Db_Expr('expire_time+'.$extraLifetime)),
-                array('id=?'=>$id, 'expire_time = 0 OR expire_time>'=>time())
+                array('id=?'=>$id, 'expire_time = 0 OR expire_time>?'=>time())
             );
         } else {
             return true;
