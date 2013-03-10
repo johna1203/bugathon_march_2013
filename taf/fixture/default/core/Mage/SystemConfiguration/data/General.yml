@@ -1,0 +1,31 @@
+default:
+    configuration_scope: Default Config
+    tab_1:
+        tab_name: country
+        configuration:
+            default: US
+            allow: ["AF", "AX", "AL", "DZ", "UM", "AS", "VI", "AD", "AO", "AI", "AQ", "AG", "AR", "AM", "AW", "AZ", "AU", "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BA", "BW", "BV", "BR", "VG", "IO", "BN", "BG", "BF", "BI", "CL", "CN", "CK", "CR", "CI", "CD", "KP", "DE", "DM", "DO", "DJ", "DK", "EC", "SV", "ER", "EE", "FK", "FJ", "FI", "FR", "GF", "PF", "TF", "FO", "GA", "GM", "GE", "GH", "GI", "GD", "GR", "GL", "GP", "GU", "GT", "GG", "GN", "GW", "GY", "HT", "HM", "HN", "IN", "ID", "IQ", "IR", "IE", "IS", "IM", "IL", "IT", "JM", "JP", "YE", "JE", "JO", "KY", "KH", "CM", "CA", "CV", "KZ", "QA", "KE", "KG", "KI", "CC", "CO", "KM", "CG", "HR", "CU", "KW", "LA", "LS", "LV", "LB", "LR", "LY", "LI", "LT", "LU", "MG", "MW", "MY", "MV", "ML", "MT", "MA", "MH", "MQ", "MR", "MU", "YT", "MK", "MX", "FM", "MC", "MN", "ME", "MS", "MZ", "MM", "NA", "NR", "NP", "NC", "NZ", "NI", "NL", "AN", "NE", "NG", "NU", "NF", "NO", "MP", "OM", "TL", "PK", "PW", "PS", "PA", "PG", "PY", "PE", "PH", "PN", "PL", "PT", "PR", "KR", "MD", "RW", "RO", "RU", "RE", "SB", "ZM", "WS", "SM", "SA", "SE", "CH", "SN", "RS", "SC", "SL", "ZW", "SG", "SK", "SI", "SO", "HK", "MO", "ES", "LK", "BL", "SH", "KN", "LC", "MF", "PM", "VC", "SD", "SR", "SJ", "SZ", "SY", "ST", "ZA", "GS", "TJ", "TW", "TZ", "TH", "TG", "TK", "TO", "TT", "TD", "CZ", "TN", "TM", "TC", "TV", "TR", "UG", "UA", "HU", "UY", "UZ", "VU", "VA", "VE", "AE", "US", "GB", "VN", "WF", "CX", "EH", "CF", "CY", "EG", "GQ", "ET", "AT"]
+            optional_zip_countries: ["IE", "PA", "HK", "MO"]
+            eu_countries: ["AT", "BE", "BG", "CY", "CZ", "DK", "EE", "FI", "FR", "DE", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "ES", "SE", "GB"]
+
+    tab_2:
+        tab_name: region
+        configuration:
+            state_required: ["AT", "CA", "CH", "DE", "EE", "ES", "FI", "FR", "LT", "LV", "RO", "US"]
+            region_display_all: 1
+    tab_3:
+        tab_name: locale
+        configuration:
+            timezone: America/Los_Angeles
+            code: en_US
+            firstday: 1
+            weekend: [0,6]
+    tab_4:
+        tab_name: store_information
+        configuration:
+            name: My Store Name
+            phone: +1 555 0000
+            merchant_country: US
+            merchant_vat_number: ""
+            address: ""
+
