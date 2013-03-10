@@ -78,18 +78,6 @@ class Mage_Adminhtml_Block_System_Email_Template_Edit_Form extends Mage_Adminhtm
                     '</script>',
             ));
         }
-        
-        if (!$templateId) {
-            $fieldset->addField('used_default_for', 'label', array(
-                'label' => Mage::helper('adminhtml')->__('Used as Default For'),
-                'container_id' => 'used_default_for',
-                'after_element_html' =>
-                    '<script type="text/javascript">' .
-                    (!(bool)$template->getOrigTemplateCode()
-                        ? '$(\'' . 'used_default_for' . '\').hide(); ' : '') .
-                    '</script>',
-            ));
-        }
 
         $templates = Mage_Core_Model_Email_Template::getDefaultTemplates();
         if (!$templateId || isset($templates[$template->getTemplateCode()])) {
@@ -99,6 +87,10 @@ class Mage_Adminhtml_Block_System_Email_Template_Edit_Form extends Mage_Adminhtm
                 'name' => 'template_code',
                 'required' => true,
                 'values' => Mage_Core_Model_Email_Template::getDefaultTemplatesAsOptionsArray(),
+            ));
+
+            $fieldset->addField('template_code_advice', 'note', array(
+                'text' => '<span id="template-code-advice-container"></span>',
             ));
 
         } else {

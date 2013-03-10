@@ -55,22 +55,6 @@
                 <tbody>
                     <tr>
                         <td class="label">
-                            <label for="template_select">
-                            <?php echo Mage::helper('adminhtml')->__('Template') ?>
-                            <span class="required">*</span>
-                            </label>
-                        </td>
-                        <td class="value">
-                            <select id="template_select" name="code" class="select required-entry">
-                                <?php foreach ($this->getTemplateOptions() as $_option): ?>
-                                <option value="<?php echo $_option['value'] ?>"<?php echo $this->getOrigTemplateCode() == $_option['value'] ? ' selected="selected"' : '' ?>><?php echo $_option['label'] ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        </td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td class="label">
                             <label for="locale_select">
                             <?php echo Mage::helper('adminhtml')->__('Locale') ?>
                             <span class="required">*</span>
@@ -128,8 +112,6 @@
             if ($('convert_button_back')) {
                 $('convert_button_back').hide();
             }
-            this.renderPaths(<?php echo $this->getUsedDefaultForPaths(); ?>, 'used_default_for');
-            this.renderPaths(<?php echo $this->getUsedCurrentlyForPaths(); ?>, 'used_currently_for');
         },
         stripTags: function () {
             if(!window.confirm("<?php echo $this->__('Are you sure that you want to strip tags?') ?>")) {
@@ -193,10 +175,17 @@
                 return;
             }
 
+            if (!Validation.validate('template_code')) {
+                return;
+            }
+
             this.variables = null;
 
+            var postParameters = Form.serialize($('email_template_load_form'), true);
+            postParameters['code'] = $('template_code').value;
+
             new Ajax.Request($('email_template_load_form').action, {
-               parameters: Form.serialize($('email_template_load_form'), true),
+               parameters: postParameters,
                area: $('email_template_load_form'),
                onComplete: function (transport) {
                    if (transport.responseText.isJSON()) {
@@ -216,43 +205,11 @@
                                   $('convert_button').show();
                               }
                           }
-                          if (pair.key == 'orig_template_used_default_for') {
-                               if(pair.value.length){
-                                   $('used_default_for').show();
-                                   this.renderPaths(pair.value, 'used_default_for');
-                               }
-                               else{
-                                   $('used_default_for').hide();
-                               }
-                          }
                        }.bind(this));
                    }
                }.bind(this)
             });
 
-        },
-
-        renderPaths: function(paths, fieldId){
-            var field = $(fieldId);
-            if(field){
-                field.down('td').next('td').update(this.parsePath(paths, '<span class="path-delimiter">&nbsp;-&gt;&nbsp;</span>', '<br />'));
-            }
-        },
-
-        parsePath: function (value, pathDelimiter, lineDelimiter) {
-            if (Object.isArray(value)) {
-                var result = [];
-                for (var i = 0, len = value.length; i < len; i++) {
-                    result.push(this.parsePath(value[i], pathDelimiter, pathDelimiter));
-                }
-                return result.join(lineDelimiter);
-            }
-
-            if(!Object.isString(value) && value.title) {
-                value = (value.url ? '<a href="' + value.url + '">' + value.title + '</a>' : value.title) + (value.scope ? '&nbsp;&nbsp;<span class="path-scope-label">(' + value.scope + ')</span>' : '');
-            }
-
-            return value;
         },
 
         openVariableChooser: function() {
