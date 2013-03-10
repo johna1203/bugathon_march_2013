@@ -44,7 +44,7 @@ class Mage_Core_Model_Cache
     /**
      * Cache frontend API
      *
-     * @var Zend_Cache_Core
+     * @var Varien_Cache_Core
      */
     protected $_frontend    = null;
 
@@ -122,6 +122,9 @@ class Mage_Core_Model_Cache
         $this->_frontend = Zend_Cache::factory('Varien_Cache_Core', $backend['type'], $frontend, $backend['options'],
             true, true, true
         );
+        if (isset($options['default_priority'])) {
+            $this->_frontend->setDefaultPriority($options['default_priority']);
+        }
 
         if (isset($options['request_processors'])) {
             $this->_requestProcessors = $options['request_processors'];

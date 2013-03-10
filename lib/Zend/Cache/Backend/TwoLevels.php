@@ -443,7 +443,7 @@ class Zend_Cache_Backend_TwoLevels extends Zend_Cache_Backend implements Zend_Ca
             'automatic_cleaning' => $slowBackendCapabilities['automatic_cleaning'],
             'tags' => $slowBackendCapabilities['tags'],
             'expired_read' => $slowBackendCapabilities['expired_read'],
-            'priority' => $slowBackendCapabilities['priority'],
+            'priority' => true,
             'infinite_lifetime' => $slowBackendCapabilities['infinite_lifetime'],
             'get_list' => $slowBackendCapabilities['get_list']
         );
