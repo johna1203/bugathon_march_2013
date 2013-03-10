@@ -34,7 +34,7 @@
 class Mage_Adminhtml_Block_Catalog_Product_Edit_Tab_Super_Config_Grid extends Mage_Adminhtml_Block_Widget_Grid
 {
 
-    protected $_configAttributeCodes = array();
+    protected $_configAttributeCodes = null;
 
     public function __construct()
     {
@@ -314,9 +314,9 @@ class Mage_Adminhtml_Block_Catalog_Product_Edit_Tab_Super_Config_Grid extends Ma
     /**
      * Retrieving configurable attributes
      */
-    protected function _configurableAttributes()
+    protected function _getConfigAttributeCodes()
     {
-        if(!$this->_configAttributeCodes) {
+        if (is_null($this->_configAttributeCodes)) {
             $product = $this->_getProduct();
             $attributes = $product->getTypeInstance(true)->getConfigurableAttributes($product);
             $attributeCodes = array();
@@ -324,93 +324,74 @@ class Mage_Adminhtml_Block_Catalog_Product_Edit_Tab_Super_Config_Grid extends Ma
                 $productAttribute = $attribute->getProductAttribute();
                 $attributeCodes[] = $productAttribute->getAttributeCode();
             }
+            $this->_configAttributeCodes = $attributeCodes;
         }
-        $this->_configAttributeCodes = $attributeCodes;
+        return $this->_configAttributeCodes;
     }
 
     /**
      * Retrieve item row configurable attribute data
      *
      * @param Varien_Object $item
-     * @return array|bool
+     * @return array
      */
     protected function _retrieveRowData(Varien_Object $item)
     {
         if (!$this->_configAttributeCodes) {
-           return false;
+           return array();
         }
         $attributeValues = array();
         foreach ($this->_configAttributeCodes as $attributeCode) {
             $data = $item->getData($attributeCode);
             if ($data) {
-                $attributeValues[] = array('code' => $attributeCode, 'value' => $data);
+                $attributeValues[$attributeCode] = $data;
             }
         }
         return $attributeValues;
     }
 
     /**
-     *  Dealing with Data after collection
+     *  Checking the data contains the same value of data after collection
      *
      * @return Mage_Adminhtml_Block_Catalog_Product_Edit_Tab_Super_Config_Grid
      */
     protected function _afterLoadCollection()
     {
-        $this->_configurableAttributes();
-        $multiSelectAllow = true;
-        if ($this->_configAttributeCodes)
-        {
-            $ids = array();
-            foreach ($this->_collection as $item) {
-                $ids[] = $item->getId();
-                $needleAttributeValues = $this->_retrieveRowData($item);
-                foreach($this->_collection as $item2) {
-                    // Skip the data if already checked
-                    if (in_array($item2->getId(), $ids)) {
-                       continue;
-                    }
-                    $attributeValues = $this->_retrieveRowData($item2);
-                    $multiSelectAllow = $this->_checkRowData ($needleAttributeValues, $attributeValues);
-                    if (!$multiSelectAllow) {
-                       break;
-                    }
+        parent::_afterLoadCollection();
+        $attributeCodes = $this->_getConfigAttributeCodes();
+        $disableMultiSelect = false;
+        if (!$attributeCodes) {
+            return $this;
+        }
+
+        $ids = array();
+        foreach ($this->_collection as $item) {
+            $ids[] = $item->getId();
+            $needleAttributeValues = $this->_retrieveRowData($item);
+            foreach($this->_collection as $item2) {
+                // Skip the data if already checked
+                if (in_array($item2->getId(), $ids)) {
+                   continue;
                 }
-                if (!$multiSelectAllow) {
-                    break;
+                $attributeValues = $this->_retrieveRowData($item2);
+                $disableMultiSelect = ($needleAttributeValues == $attributeValues);
+                if ($disableMultiSelect) {
+                   break;
                 }
+            }
+            if ($disableMultiSelect) {
+                break;
             }
         }
 
         // Disable multiselect column
-        if (!$multiSelectAllow) {
+        if ($disableMultiSelect) {
             $selectAll = $this->getColumn('in_products');
             if ($selectAll) {
                 $selectAll->setDisabled(true);
             }
         }
 
-        return parent::_afterLoadCollection();
+        return $this;
     }
-
-    /**
-     * Checking two row data the same or name
-     *
-     * @param array $needle
-     * @param array $attribute
-     * @return bool
-     */
-    protected function _checkRowData($needle, $attribute) {
-        $_differenceData = false;
-        for ($i = 0; $i < sizeof($needle) && !$_differenceData; $i++) {
-
-            for ($j = 0; $j < sizeof($attribute) && !$_differenceData; $j++) {
-                 if ($needle[$i]['code'] == $attribute[$j]['code']
-                    && $needle[$i]['value'] != $attribute[$j]['value']) {
-                     $_differenceData = true;
-                }
-            }
-        }
-        return $_differenceData;
-    }
-
 }

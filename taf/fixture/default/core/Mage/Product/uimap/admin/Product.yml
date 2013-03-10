@@ -529,6 +529,8 @@ new_product:
                                         associated_search_position_to: //input[@name='position[to]']
                                         associated_product_position: %productXpath%//input[@name='position']
                                         associated_product_default_qty: %productXpath%//input[@name='qty']
+                                    checkboxes:
+                                        associated_product_select_all_disabled: //input[@title='Select All'][@disabled='disabled']
                                     pageelements:
                                         associated_table: //table[@id]
                 -
