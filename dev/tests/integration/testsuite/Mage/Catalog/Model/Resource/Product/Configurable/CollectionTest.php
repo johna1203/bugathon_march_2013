@@ -60,12 +60,20 @@ class Mage_Catalog_Model_Resource_Product_Configurable_CollectionTest
         $collectionWithFlag = clone $collectionWithoutFlag;
         $collectionWithFlag->setFlag('load_associated_products', true);
 
+        /** @var $product Mage_Catalog_Model_Product */
+
         $withFlagLoadStart = microtime(true);
-        $collectionWithFlag->load();
+        foreach ($collectionWithFlag->load() as $product) {
+            // Load the used products
+            $product->getTypeInstance(true)->getUsedProducts(null, $product);
+        }
         $withFlagLoadTime = microtime(true) - $withFlagLoadStart;
 
         $withoutFlagLoadStart = microtime(true);
-        $collectionWithoutFlag->load();
+        foreach ($collectionWithoutFlag->load() as $product) {
+            // Load the used products
+            $product->getTypeInstance(true)->getUsedProducts(null, $product);
+        }
         $withoutLoadTime= microtime(true) - $withoutFlagLoadStart;
 
         $this->assertLessThan(
