@@ -467,6 +467,14 @@
                     </catalog_add_topmenu_items>
                 </observers>
             </page_block_html_topmenu_gethtml_before>
+            <catalog_entity_attribute_save_before>
+                <observers>
+                    <catalog_check_reserved_attribute_codes>
+                        <class>catalog/observer</class>
+                        <method>checkReservedAttributeCodes</method>
+                    </catalog_check_reserved_attribute_codes>
+                </observers>
+            </catalog_entity_attribute_save_before>
         </events>
         <catalog>
             <product>
