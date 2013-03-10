@@ -309,12 +309,6 @@ associated_configurable_data: &associatedProductsConfigurableData
     associated_configurable_1: *configurableAssociatedProduct1
     associated_configurable_2: %noValue%
 
-associated_configurable_data_config_massaction:
-    associated_products_attribute_name_default: %noValue%
-    associated_products_attribute_name: %noValue%
-    associated_configurable_1: *configurableAssociatedProduct1
-    associated_configurable_2: *configurableAssociatedProduct1
-
 #*********************************************
 #*         Bundle Items Data                 *
 #*********************************************

@@ -337,11 +337,8 @@ class Mage_Adminhtml_Block_Catalog_Product_Edit_Tab_Super_Config_Grid extends Ma
      */
     protected function _retrieveRowData(Varien_Object $item)
     {
-        if (!$this->_configAttributeCodes) {
-           return array();
-        }
         $attributeValues = array();
-        foreach ($this->_configAttributeCodes as $attributeCode) {
+        foreach ($this->_getConfigAttributeCodes() as $attributeCode) {
             $data = $item->getData($attributeCode);
             if ($data) {
                 $attributeValues[$attributeCode] = $data;
@@ -358,12 +355,13 @@ class Mage_Adminhtml_Block_Catalog_Product_Edit_Tab_Super_Config_Grid extends Ma
     protected function _afterLoadCollection()
     {
         parent::_afterLoadCollection();
+
         $attributeCodes = $this->_getConfigAttributeCodes();
-        $disableMultiSelect = false;
         if (!$attributeCodes) {
             return $this;
         }
 
+        $disableMultiSelect = false;
         $ids = array();
         foreach ($this->_collection as $item) {
             $ids[] = $item->getId();
