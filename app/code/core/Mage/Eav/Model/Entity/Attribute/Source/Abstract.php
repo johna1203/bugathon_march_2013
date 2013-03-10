@@ -109,7 +109,8 @@ abstract class Mage_Eav_Model_Entity_Attribute_Source_Abstract
      * @param string $dir direction
      * @return Mage_Eav_Model_Entity_Attribute_Source_Abstract
      */
-    public function addValueSortToCollection($collection, $dir = Varien_Data_Collection::SORT_ORDER_DESC) {
+    public function addValueSortToCollection($collection, $dir = Varien_Data_Collection::SORT_ORDER_DESC)
+    {
         $valueTable1    = $this->getAttribute()->getAttributeCode() . '_t1';
         $valueTable2    = $this->getAttribute()->getAttributeCode() . '_t2';
 
