@@ -213,13 +213,6 @@ class Mage_Core_Model_Store extends Mage_Core_Model_Abstract
     protected $_frontendName = null;
 
     /**
-     * Store Phone
-     *
-     * @var string|null
-     */
-    protected $_storePhone = null;
-
-    /**
      * Readonly flag
      *
      * @var bool
