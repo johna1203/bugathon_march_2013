@@ -303,4 +303,11 @@ class Mage_Core_Helper_String extends Mage_Core_Helper_Abstract
         return $sort;
     }
 
+    public function formatStringForXmlNode($str)
+    {
+        $str = Mage::helper('core')->removeAccents($str);
+        $urlKey = preg_replace('/[^a-z_]+/i', '_', $str);
+        $urlKey = trim($urlKey, '-');
+        return $urlKey;
+    }
 }

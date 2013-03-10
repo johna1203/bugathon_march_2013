@@ -58,6 +58,11 @@ class Mage_Catalog_Helper_Product_View extends Mage_Core_Helper_Abstract
 
         $update->addHandle('PRODUCT_TYPE_' . $product->getTypeId());
         $update->addHandle('PRODUCT_' . $product->getId());
+
+        $attributeSet = Mage::getModel('eav/entity_attribute_set')->load($product->getAttributeSetId());
+        $attributeSetName = Mage::helper('core/string')->formatStringForXmlNode($attributeSet->getAttributeSetName());
+        $update->addHandle('PRODUCT_ATTRIBUTE_SET_NAME_' . $attributeSetName);
+
         $controller->loadLayoutUpdates();
 
         // Apply custom layout update once layout is loaded
