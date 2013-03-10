@@ -491,6 +491,10 @@ system_configuration:
                                         send_emails_to_use_default: //input[@name='groups[email][fields][recipient_email][inherit]']
                                         email_sender_use_default: //input[@name='groups[email][fields][sender_email_identity][inherit]']
                                         email_template_use_default: //input[@name='groups[email][fields][email_template][inherit]']
+                                    messages:
+                                        required_field: //*[@id='advice-required-entry-contacts_email_recipient_email']
+
+
                 -
                     general_reports:
                         xpath: //a[contains(@href, 'edit/section/reports/')]
