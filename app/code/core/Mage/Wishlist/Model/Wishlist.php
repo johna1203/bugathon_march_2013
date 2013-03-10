@@ -46,6 +46,7 @@ class Mage_Wishlist_Model_Wishlist extends Mage_Core_Model_Abstract
     const XML_PATH_ENABLE_QTY_INCREMENTS = 'cataloginventory/item_options/enable_qty_increments';
     const XML_PATH_QTY_INCREMENTS = 'cataloginventory/item_options/qty_increments';
 
+
     /**
      * Prefix of model events names
      *
@@ -365,19 +366,27 @@ class Mage_Wishlist_Model_Wishlist extends Mage_Core_Model_Abstract
             }
             $candidate->setWishlistStoreId($storeId);
 
-            $is_config_qty_increments_enabled = (bool) Mage::getStoreConfig(self::XML_PATH_ENABLE_QTY_INCREMENTS,$storeId);
-            $use_config_min_qty = (bool) $candidate->getStockItem()->getUseConfigMinSaleQty();
-            if($is_config_qty_increments_enabled && $use_config_min_qty) {
-                $qty_increments = Mage::getStoreConfig(self::XML_PATH_QTY_INCREMENTS,$storeId);
-                if($candidate->getQty() < $qty_increments ) {
-                    $qty = $qty_increments;
+            $isConfigQtyIncrementsEnabled = (bool) Mage::getStoreConfig(self::XML_PATH_ENABLE_QTY_INCREMENTS,$storeId);
+            $useConfigMinQty = (bool) $candidate->getStockItem()->getUseConfigMinSaleQty();
+            $useConfigQtyIncrements = (bool) $candidate->getStockItem()->getUseConfigQtyIncrements();
+
+            if ($isConfigQtyIncrementsEnabled && $useConfigQtyIncrements) {
+                $qtyIncrements = Mage::getStoreConfig(self::XML_PATH_QTY_INCREMENTS,$storeId);
+                if ($candidate->getQty() < $qtyIncrements ) {
+                    $qty = $qtyIncrements;
                 }
-            } else if (!$use_config_min_qty) {
+            } else if (!$useConfigMinQty) {
                 $qty = $candidate->getStockItem()->getMinSaleQty();
+            } else if (!$useConfigQtyIncrements) {
+                if ($candidate->getQty() < $candidate->getStockItem()->getQtyIncrements()) {
+                    $qty = $candidate->getStockItem()->getQtyIncrements();
+                }
             }
             else {
                 $qty = $candidate->getQty() ? $candidate->getQty() : 1; // No null values as qty. Convert zero to 1.
             }
+
+
 
 
             $item = $this->_addCatalogProduct($candidate, $qty, $forciblySetQty);
