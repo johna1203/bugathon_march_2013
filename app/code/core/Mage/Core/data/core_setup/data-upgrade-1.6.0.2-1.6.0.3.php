@@ -87,8 +87,9 @@ foreach ($templates as $template) {
 
             $template['template_code'] = $configValuesMap[$config['path']];
             if ($i > 0) {
-                unset($template['template_id']);
-                $template['template_id'] = $installer->getConnection()->lastInsertId();
+
+                // duplicate template
+                $template['template_id'] = null;
             }
 
             $stores = array();
