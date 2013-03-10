@@ -82,6 +82,13 @@ class Mage_Catalog_Model_Resource_Product_CollectionTest extends PHPUnit_Framewo
         $this->assertLessThan($first, $last, "Sorting by custom attribute '$attributeCode' (DESC)");
     }
 
+    /**
+     * The attribute codes have to match the ones declared in the fixture file
+     *
+     * See Mage/Catalog/_files/products_sort_attributes.php
+     *
+     * @return array
+     */
     public function sortByCustomAttributesDataProvider()
     {
         return array(
