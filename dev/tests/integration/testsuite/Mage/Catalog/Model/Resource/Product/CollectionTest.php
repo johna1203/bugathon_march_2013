@@ -11,6 +11,7 @@
 
 /**
  * @group module:Mage_Catalog
+ * @magentoDataFixture Mage/Catalog/_files/products_sort_attributes.php
  */
 class Mage_Catalog_Model_Resource_Product_CollectionTest extends PHPUnit_Framework_TestCase
 {
@@ -20,7 +21,6 @@ class Mage_Catalog_Model_Resource_Product_CollectionTest extends PHPUnit_Framewo
     protected $_collection;
 
     /**
-     * Sets up the fixture, for example, opens a network connection.
      * This method is called before a test is executed.
      */
     protected function setUp()
@@ -51,6 +51,43 @@ class Mage_Catalog_Model_Resource_Product_CollectionTest extends PHPUnit_Framewo
         return array(
             array(array('sku', 'sku'), array('sku')),
             array(array('sku', 'name', 'sku'), array('name', 'sku')),
+        );
+    }
+
+    /**
+     * @param $attributeCode
+     * @dataProvider sortByCustomAttributesDataProvider
+     */
+    public function testSortAscByCustomAttributes($attributeCode)
+    {
+        $this->_collection
+                ->setOrder($attributeCode, 'ASC')
+                ->load(true);
+        $first = $this->_collection->getFirstItem()->getData($attributeCode);
+        $last  = $this->_collection->getLastItem()->getData($attributeCode);
+        $this->assertLessThan($last, $first, "Sorting by custom attribute '$attributeCode' (ASC)");
+    }
+
+    /**
+     * @param string $attributeCode
+     * @dataProvider sortByCustomAttributesDataProvider
+     */
+    public function testSortDescByCustomAttributes($attributeCode)
+    {
+        $this->_collection
+                ->setOrder($attributeCode, 'DESC')
+                ->load();
+        $first = $this->_collection->getFirstItem()->getData($attributeCode);
+        $last  = $this->_collection->getLastItem()->getData($attributeCode);
+        $this->assertLessThan($first, $last, "Sorting by custom attribute '$attributeCode' (DESC)");
+    }
+
+    public function sortByCustomAttributesDataProvider()
+    {
+        return array(
+            array('attr_src_bool'),
+            array('attr_src_cntryofmnfctr'),
+            array('attr_src_table'),
         );
     }
 }
