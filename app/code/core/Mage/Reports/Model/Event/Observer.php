@@ -124,11 +124,15 @@ class Mage_Reports_Model_Event_Observer
     public function catalogProductView(Varien_Event_Observer $observer)
     {
         $productId = $observer->getEvent()->getProduct()->getId();
-
-        Mage::getModel('reports/product_index_viewed')
-            ->setProductId($productId)
-            ->save()
-            ->calculate();
+        
+        try {
+            Mage::getModel('reports/product_index_viewed')
+                ->setProductId($productId)
+                ->save()
+                ->calculate();
+        } catch (Exception $e) {
+            Mage::logException($e);
+        }
 
         return $this->_event(Mage_Reports_Model_Event::EVENT_PRODUCT_VIEW, $productId);
     }
