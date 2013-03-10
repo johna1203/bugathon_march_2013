@@ -415,6 +415,13 @@ class Mage_SalesRule_Model_Validator extends Mage_Core_Model_Abstract
                     //get discount for original price
                     $originalDiscountAmount    = $discountQty * $itemOriginalPrice;
                     $baseOriginalDiscountAmount= $discountQty * $baseItemOriginalPrice;
+
+                    // If no discount has been applied, then go to the next rule
+                    // in the foreach.
+                    if (!$discountAmount) {
+                        continue 2;
+                    }
+
                     break;
             }
 
