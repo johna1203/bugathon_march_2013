@@ -99,9 +99,7 @@ class Mage_Page_Block_Template_Links extends Mage_Core_Block_Template
         ));
 
         $this->_links[$this->_getNewPosition($position)] = $link;
-        if (intval($position) > 0) {
-             ksort($this->_links);
-        }
+        $this->_sortLinks($position);
 
         return $this;
     }
@@ -117,6 +115,7 @@ class Mage_Page_Block_Template_Links extends Mage_Core_Block_Template
         $block = $this->getLayout()->getBlock($blockName);
         if ($block) {
             $this->_links[$this->_getNewPosition((int)$block->getPosition())] = $block;
+            $this->_sortLinks($block->getPosition());
         }
         return $this;
     }
@@ -238,4 +237,17 @@ class Mage_Page_Block_Template_Links extends Mage_Core_Block_Template
         return $position;
     }
 
+    /**
+     * Perform ksort() on _links array if position is specified
+     *
+     * @param int $position
+     * @return Mage_Page_Block_Template_Links
+     */
+    public function _sortLinks($position)
+    {
+        if (intval($position) > 0) {
+             ksort($this->_links);
+        }
+        return $this;
+    }
 }
