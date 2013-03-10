@@ -211,6 +211,7 @@ class Mage_Page_Block_Template_Links extends Mage_Core_Block_Template
             $this->_links[key($this->_links)]->setIsFirst(true);
             end($this->_links);
             $this->_links[key($this->_links)]->setIsLast(true);
+            reset($this->_links);
         }
         return parent::_beforeToHtml();
     }
