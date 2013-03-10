@@ -172,6 +172,24 @@ class Mage_Sales_Model_Order_Config extends Mage_Core_Model_Config_Base
         $this->_stateStatuses[$key] = $statuses;
         return $statuses;
     }
+    
+    
+    /**
+     * Retrieve state available for status
+     * Get all assigned states for specified status
+     * 
+     * @param string $status
+     * @return array
+     */
+    public function getStatusStates($status)
+    {
+        $states = array();
+        $collection = Mage::getResourceModel('sales/order_status_collection')->addStatusFilter($status);
+        foreach ($collection as $state) {
+            $states[] = $state;
+        }
+        return $states;
+    }
 
     /**
      * Retrieve states which are visible on front end

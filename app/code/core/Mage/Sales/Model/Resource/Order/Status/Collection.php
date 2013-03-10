@@ -89,6 +89,18 @@ class Mage_Sales_Model_Resource_Order_Status_Collection extends Mage_Core_Model_
         $this->getSelect()->where('state_table.state=?', $state);
         return $this;
     }
+    
+    /**
+     * add status code filter to collection
+     *
+     * @param string $status
+     */
+    public function addStatusFilter($status)
+    {
+        $this->joinStates();
+        $this->getSelect()->where('state_table.status=?', $status);
+        return $this;
+    }
 
     /**
      * Define label order
