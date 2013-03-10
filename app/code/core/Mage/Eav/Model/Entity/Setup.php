@@ -605,9 +605,7 @@ class Mage_Eav_Model_Entity_Setup extends Mage_Core_Model_Resource_Setup
             'default_value'   => $this->_getValue($attr, 'default'),
             'is_unique'       => $this->_getValue($attr, 'unique', 0),
             'note'            => $this->_getValue($attr, 'note'),
-            'is_global'       => $this->_getValue($attr, 'global',
-                                     Mage_Catalog_Model_Resource_Eav_Attribute::SCOPE_GLOBAL
-                                 ),
+            'is_global'       => $this->_getValue($attr, 'global', 1),
         );
 
         return $data;

@@ -37,7 +37,7 @@ abstract class Mage_Eav_Block_Adminhtml_Attribute_Edit_Options_Abstract extends 
     public function __construct()
     {
         parent::__construct();
-        $this->setTemplate('catalog/product/attribute/options.phtml');
+        $this->setTemplate('eav/attribute/options.phtml');
     }
 
     /**

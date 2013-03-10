@@ -28,15 +28,15 @@
 /**
  * Attribute options control
  *
- * @deprecated after 1.7.0.2 The file is moved
- * @see Mage_Adminhtml_Block_Catalog_Product_Attribute_Edit_Tab_Options
+ * @see Mage_Eav_Block_Adminhtml_Attribute_Edit_Options_Abstract
+ * @var $this Mage_Eav_Block_Adminhtml_Attribute_Edit_Options_Abstract
  */
 ?>
 <div>
 <ul class="messages">
     <li class="notice-msg">
         <ul>
-            <li><?php echo Mage::helper('catalog')->__('If you do not specify an option value for a specific store view then the default (Admin) value will be used.') ?></li>
+            <li><?php echo $this->__('If you do not specify an option value for a specific store view then the default (Admin) value will be used.') ?></li>
         </ul>
     </li>
 </ul>
@@ -44,7 +44,7 @@
 
 <div class="entity-edit">
     <div class="entry-edit-head">
-        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('catalog')->__('Manage Titles (Size, Color, etc.)') ?></h4>
+        <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Manage Titles (Size, Color, etc.)') ?></h4>
     </div>
     <div class="box">
             <div class="hor-scroll">
@@ -69,7 +69,7 @@
 <br/>
 <div class="entity-edit" id="matage-options-panel">
     <div class="entry-edit-head">
-    <h4 class="icon-head head-edit-form fieldset-legend"><?php echo Mage::helper('catalog')->__('Manage Options (values of your attribute)') ?></h4>
+    <h4 class="icon-head head-edit-form fieldset-legend"><?php echo $this->__('Manage Options (values of your attribute)') ?></h4>
     </div>
     <div class="box">
         <div class="hor-scroll">
@@ -78,8 +78,8 @@
                     <?php foreach ($this->getStores() as $_store): ?>
                         <th><?php echo $_store->getName() ?></th>
                     <?php endforeach; ?>
-                        <th><?php echo Mage::helper('catalog')->__('Position') ?></th>
-                        <th class="nobr a-center"><?php echo Mage::helper('catalog')->__('Is Default') ?></th>
+                        <th><?php echo $this->__('Position') ?></th>
+                        <th class="nobr a-center"><?php echo $this->__('Is Default') ?></th>
                         <th>
                             <?php if (!$this->getReadOnly()):?>
                                 <?php echo $this->getAddNewButtonHtml() ?>
@@ -210,11 +210,11 @@ if($('add_new_option_button')){
     Event.observe('add_new_option_button', 'click', attributeOption.add.bind(attributeOption));
 }
 Validation.addAllThese([
-    ['required-option', '<?php echo Mage::helper('catalog')->__('Failed') ?>', function(v) {
+    ['required-option', '<?php echo $this->__('Failed') ?>', function(v) {
         return !Validation.get('IsEmpty').test(v);
 }]]);
 Validation.addAllThese([
-    ['required-options-count', '<?php echo Mage::helper('catalog')->__('Options is required') ?>', function(v) {
+    ['required-options-count', '<?php echo $this->__('Options is required') ?>', function(v) {
         return !Validation.get('IsEmpty').test(v);
 }]]);
 <?php foreach ($this->getOptionValues() as $_value): ?>

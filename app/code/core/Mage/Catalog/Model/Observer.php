@@ -311,4 +311,26 @@ class Mage_Catalog_Model_Observer
         $categoryPathIds = explode(',', $currentCategory->getPathInStore());
         return in_array($category->getId(), $categoryPathIds);
     }
+
+    /**
+     * Checks whether attribute_code by current module is reserved
+     *
+     * @param Varien_Event_Observer $observer
+     * @throws Mage_Core_Exception
+     */
+    public function checkReservedAttributeCodes(Varien_Event_Observer $observer)
+    {
+        /** @var $attribute Mage_Catalog_Model_Entity_Attribute */
+        $attribute = $observer->getEvent()->getAttribute();
+        if (!is_object($attribute)) {
+            return;
+        }
+        /** @var $product Mage_Catalog_Model_Product */
+        $product = Mage::getModel('catalog/product');
+        if ($product->isReservedAttribute($attribute)) {
+            throw new Mage_Core_Exception(
+                Mage::helper('catalog')->__('The attribute code \'%s\' is reserved by system. Please try another attribute code', $attribute->getAttributeCode())
+            );
+        }
+    }
 }
