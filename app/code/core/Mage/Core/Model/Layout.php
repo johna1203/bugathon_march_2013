@@ -195,6 +195,13 @@ class Mage_Core_Model_Layout extends Varien_Simplexml_Config
         if (empty($parent)) {
             $parent = $this->getNode();
         }
+
+		if (isset($parent['ifconfig']) && ($configPath = (string)$parent['ifconfig'])) {
+			if (!Mage::getStoreConfigFlag($configPath)) {
+				return;
+			}
+		}
+
         foreach ($parent as $node) {
             $attributes = $node->attributes();
             if ((bool)$attributes->ignore) {
@@ -226,6 +233,12 @@ class Mage_Core_Model_Layout extends Varien_Simplexml_Config
      */
     protected function _generateBlock($node, $parent)
     {
+		if (isset($node['ifconfig']) && ($configPath = (string)$node['ifconfig'])) {
+			if (!Mage::getStoreConfigFlag($configPath)) {
+				return $this;
+			}
+		}
+
         if (!empty($node['class'])) {
             $className = (string)$node['class'];
         } else {
