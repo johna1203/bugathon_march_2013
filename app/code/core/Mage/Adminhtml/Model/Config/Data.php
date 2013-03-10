@@ -331,11 +331,11 @@ class Mage_Adminhtml_Model_Config_Data extends Varien_Object
      */
     public function getConfigDataValue($path, &$inherit = null, $configData = null)
     {
-        $this->load();
+        $storedConfigData = $this->load();
         if (is_null($configData)) {
-            $configData = $this->_configData;
+            $configData = $storedConfigData;
         }
-        if (isset($configData[$path])) {
+        if (array_key_exists($path, $configData)) {
             $data = $configData[$path];
             $inherit = false;
         } else {

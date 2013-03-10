@@ -767,12 +767,12 @@ class Mage_CatalogInventory_Model_Observer
     public function cancelOrderItem($observer)
     {
         $item = $observer->getEvent()->getItem();
-
+        $storeId = $item->getOrder()->getStoreId();
         $children = $item->getChildrenItems();
         $qty = $item->getQtyOrdered() - max($item->getQtyShipped(), $item->getQtyInvoiced()) - $item->getQtyCanceled();
 
         if ($item->getId() && ($productId = $item->getProductId()) && empty($children) && $qty) {
-            Mage::getSingleton('cataloginventory/stock')->backItemQty($productId, $qty);
+            Mage::getSingleton('cataloginventory/stock')->backItemQty($productId, $qty, $storeId);
         }
 
         return $this;
