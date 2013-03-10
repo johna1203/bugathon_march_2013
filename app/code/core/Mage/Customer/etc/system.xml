@@ -220,25 +220,6 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>
                         </confirm>
-                        <email_confirmation_template translate="label">
-                            <label>Confirmation Link Email</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_email_template</source_model>
-                            <sort_order>100</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </email_confirmation_template>
-                        <email_confirmed_template translate="label comment">
-                            <label>Welcome Email</label>
-                            <comment>This email will be sent instead of default welcome email, after account confirmation.</comment>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_email_template</source_model>
-                            <sort_order>110</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </email_confirmed_template>
                         <generate_human_friendly_id translate="label">
                             <label>Generate Human-Friendly Customer ID</label>
                             <frontend_type>select</frontend_type>
@@ -258,24 +239,6 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
-                        <forgot_email_template translate="label">
-                            <label>Forgot Email Template</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_email_template</source_model>
-                            <sort_order>10</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </forgot_email_template>
-                        <remind_email_template translate="label">
-                            <label>Remind Email Template</label>
-                            <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_email_template</source_model>
-                            <sort_order>20</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </remind_email_template>
                         <forgot_email_identity translate="label">
                             <label>Forgot and Remind Email Sender</label>
                             <frontend_type>select</frontend_type>

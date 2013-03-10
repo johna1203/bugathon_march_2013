@@ -40,7 +40,6 @@ $configValuesMap = array(
     'customer/create_account/email_confirmed_template'  => 'customer_create_account_email_confirmed_template',
     'customer/password/forgot_email_template'           => 'customer_password_forgot_email_template',
     'customer/password/remind_email_template'           => 'customer_password_remind_email_template',
-    'customer/create_account/email_template'            => 'customer_create_account_email_template',
     'customer/password_forgot/email_template'           => 'customer_password_forgot_email_template',
     'newsletter/subscription/confirm_email_template'    => 'newsletter_subscription_confirm_email_template',
     'newsletter/subscription/success_email_template'    => 'newsletter_subscription_success_email_template',
@@ -127,4 +126,10 @@ foreach ($configs as $config) {
     }
 
     $usedTemplates[] = $config['value'];
+
+    // remove old config setting
+    $installer->getConnection()->delete(
+        $installer->getTable('core/config_data'),
+        array('id = ?' => $config['id'])
+    );
 }
