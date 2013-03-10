@@ -59,17 +59,19 @@
             var checkbox = Element.getElementsBySelector(trElement, 'input');
             if(checkbox[0]){
                 var checked = isInput ? checkbox[0].checked : !checkbox[0].checked;
-                if (checked) {
+                if (!checked) {
                     checkbox[0].checked = true;
                     if ( confirm("<?php echo $this->__('Warning!\r\nThis action will remove this user from already assigned role\r\nAre you sure?') ?>") ) {
-                        checkBoxes.set(checkbox[0].value, checked);
+                    	checkbox[0].checked = false;
+                        checkBoxes.unset(checkbox[0].value);
                         varienElementMethods.setHasChanges(checkbox[0]);
                     } else {
-                        checkbox[0].checked = false;
+                        checkbox[0].checked = true;
                     }
                     warning = false;
                 } else {
-                    checkBoxes.unset(checkbox[0].value);
+                    checkBoxes.set(checkbox[0].value, checked);
+                    varienElementMethods.setHasChanges(checkbox[0]);
                 }
 
                 $('in_role_users').value = checkBoxes.toQueryString();
