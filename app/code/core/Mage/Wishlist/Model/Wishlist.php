@@ -240,6 +240,9 @@ class Mage_Wishlist_Model_Wishlist extends Mage_Core_Model_Abstract
                 ->addStoreFilter($this->getSharedStoreIds($currentWebsiteOnly))
                 ->setVisibilityFilter();
         }
+        if ($currentWebsiteOnly) {
+            $this->_itemCollection->addWebsiteFilter();
+        }
 
         return $this->_itemCollection;
     }

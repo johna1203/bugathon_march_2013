@@ -248,6 +248,21 @@ class Mage_Wishlist_Model_Resource_Item_Collection extends Mage_Core_Model_Resou
     }
 
     /**
+     * Add website filter
+     */
+     public function addWebsiteFilter() {
+
+         $this->getSelect()
+             ->join(
+             array('website' => $this->getTable('catalog/product_website')),
+             'main_table.product_id = website.product_id',
+             array()
+         )->where('website.website_id = ?', Mage::app()->getStore()->getWebsite()->getId());
+
+         return $this;
+     }
+
+    /**
      * Add filter by shared stores
      *
      * @param array $storeIds
