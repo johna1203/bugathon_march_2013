@@ -134,4 +134,20 @@ class Mage_Core_Helper_File_Storage extends Mage_Core_Helper_Abstract
     {
         return $this->getStorageFileModel()->saveFile($file, true);
     }
+
+    /**
+     * First check this file on FS
+     * If it doesn't exist - try to download it from DB
+     *
+     * @param string $filename
+     * @return bool
+     */
+    public function fileExists($filename)
+    {
+        if (file_exists($filename)) {
+            return true;
+        } else {
+            return Mage::helper('core/file_storage_database')->saveFileToFilesystem($filename);
+        }
+    }
 }

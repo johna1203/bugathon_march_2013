@@ -700,10 +700,6 @@ class Mage_Catalog_Model_Product_Image extends Mage_Core_Model_Abstract
      * @return bool
      */
     protected function _fileExists($filename) {
-        if (file_exists($filename)) {
-            return true;
-        } else {
-            return Mage::helper('core/file_storage_database')->saveFileToFilesystem($filename);
-        }
+        return Mage::helper('core/file_storage')->fileExists($filename);
     }
 }
