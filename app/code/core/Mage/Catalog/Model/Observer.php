@@ -316,7 +316,7 @@ class Mage_Catalog_Model_Observer
      * Checks whether attribute_code by current module is reserved
      *
      * @param Varien_Event_Observer $observer
-     * @throws Mage_Catalog_Exception
+     * @throws Mage_Core_Exception
      */
     public function checkReservedAttributeCodes(Varien_Event_Observer $observer)
     {
@@ -328,7 +328,7 @@ class Mage_Catalog_Model_Observer
         /** @var $product Mage_Catalog_Model_Product */
         $product = Mage::getModel('catalog/product');
         if ($product->isReservedAttribute($attribute)) {
-            throw new Mage_Catalog_Exception(
+            throw new Mage_Core_Exception(
                 Mage::helper('catalog')->__('The attribute code \'%s\' is reserved by system. Please try another attribute code', $attribute->getAttributeCode())
             );
         }

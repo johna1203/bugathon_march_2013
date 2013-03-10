@@ -39,7 +39,7 @@ class Mage_Catalog_Model_ObserverTest extends PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException Mage_Catalog_Exception
+     * @expectedException Mage_Core_Exception
      */
     public function testCheckReservedAttributeCodesAttributeException()
     {
