@@ -140,6 +140,11 @@ class Mage_Core_Model_ConfigTest extends PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDbIsolation enabled
+     * @magentoDataFixture Mage/Core/_files/config.php
+     */
     public function testGetNode()
     {
         $model = $this->_createModel();
@@ -148,6 +153,30 @@ class Mage_Core_Model_ConfigTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Mage_Core_Model_Config_Element', $model->getNode());
         $this->assertInstanceOf('Mage_Core_Model_Config_Element', $model->getNode(null, 'store', 1));
         $this->assertInstanceOf('Mage_Core_Model_Config_Element', $model->getNode(null, 'website', 1));
+
+        foreach ($this->configDataProvider() as $sample) {
+
+            list($path, $storeCode, $expectedValue) = $sample;
+            $store = Mage::getModel('core/store')->load($storeCode);
+            $this->assertInstanceOf('Mage_Core_Model_Store', $store);
+            $actualValue = $model->getNode($path, 'stores', $storeCode);
+            $this->assertEquals($expectedValue, $actualValue, "Store: $storeCode, Path: $path");
+        }
+    }
+
+    public function configDataProvider()
+    {
+        return array(
+            array('aaa/bbb/ccc', 'store_0_0_1', '4'), // <path>, <storeCode>, <expectedValue>
+            array('aaa/bbb/ccc', 'store_0_1_0', '3'),
+            array('aaa/bbb/ccc', 'store_0_1_1', '3'),
+            array('aaa/bbb/ccc', 'store_0_0_0', '3'),
+
+            array('aaa/bbb/ccc', 'store_1_0_1', '5'),
+            array('aaa/bbb/ccc', 'store_1_1_0', '5'),
+            array('aaa/bbb/ccc', 'store_1_1_1', '5'),
+            array('aaa/bbb/ccc', 'store_1_0_0', '5'),
+        );
     }
 
     public function testSetNode()
