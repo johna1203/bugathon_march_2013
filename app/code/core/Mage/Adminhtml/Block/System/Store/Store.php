@@ -32,20 +32,30 @@
  * @author      Magento Core Team <core@magentocommerce.com>
  */
 
-class Mage_Adminhtml_Block_System_Store_Store extends Mage_Adminhtml_Block_Widget_Grid_Container
+class Mage_Adminhtml_Block_System_Store_Store extends Mage_Adminhtml_Block_Widget_Container
 {
     public function __construct()
     {
         $this->_controller  = 'system_store';
         $this->_headerText  = Mage::helper('adminhtml')->__('Manage Stores');
+        $this->setTemplate('system/store/container.phtml');
         parent::__construct();
     }
 
     protected function _prepareLayout()
     {
-        /* Update default add button to add website button */
-        $this->_updateButton('add', 'label', Mage::helper('core')->__('Create Website'));
-        $this->_updateButton('add', 'onclick', "setLocation('".$this->getUrl('*/*/newWebsite')."')");
+        /* Add website button */
+        $this->_addButton('add', array(
+            'label'     => Mage::helper('core')->__('Create Website'),
+            'onclick'   => 'setLocation(\'' . $this->getUrl('*/*/newWebsite') .'\')',
+            'class'     => 'add',
+        ));
+
+        $this->_addButton('add_group', array(
+            'label'     => Mage::helper('core')->__('Create Store'),
+            'onclick'   => 'setLocation(\'' . $this->getUrl('*/*/newGroup') .'\')',
+            'class'     => 'add',
+        ));
 
         /* Add Store Group button */
         $this->_addButton('add_group', array(
@@ -62,6 +72,11 @@ class Mage_Adminhtml_Block_System_Store_Store extends Mage_Adminhtml_Block_Widge
         ));
 
         return parent::_prepareLayout();
+    }
+
+    public function getGridHtml()
+    {
+        return $this->getLayout()->createBlock('adminhtml/system_store_tree')->toHtml();
     }
 
     public function getAddNewButtonHtml()
