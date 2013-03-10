@@ -64,6 +64,7 @@ class Mage_Core_Model_Store extends Mage_Core_Model_Abstract
     const XML_PATH_OFFLOADER_HEADER       = 'web/secure/offloader_header';
     const XML_PATH_PRICE_SCOPE            = 'catalog/price/scope';
 
+
     /**
      * Price scope constants
      */
@@ -210,6 +211,13 @@ class Mage_Core_Model_Store extends Mage_Core_Model_Abstract
      * @var string|null
      */
     protected $_frontendName = null;
+
+    /**
+     * Store Phone
+     *
+     * @var string|null
+     */
+    protected $_storePhone = null;
 
     /**
      * Readonly flag
@@ -1210,5 +1218,16 @@ class Mage_Core_Model_Store extends Mage_Core_Model_Abstract
             $this->_frontendName = (!empty($storeGroupName)) ? $storeGroupName : $this->getGroup()->getName();
         }
         return $this->_frontendName;
+    }
+
+    /**
+     * Check if store phone exists
+     *
+     * @return void
+    */
+    public function hasStorePhone()
+    {
+        $storePhone = (string) Mage::getStoreConfig('general/store_information/phone', $this);
+        if (!empty($storePhone)) return true;
     }
 }
