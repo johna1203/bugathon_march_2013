@@ -261,10 +261,7 @@ class Varien_Cache_Backend_Database extends Zend_Cache_Backend implements Zend_C
                 break;
             case Zend_Cache::CLEANING_MODE_OLD:
                 if ($this->_options['store_data']) {
-                    $result = $adapter->delete($this->_getDataTable(), array(
-                        'expire_time> ?' => 0,
-                        'expire_time<= ?' => time()
-                    ));
+                    $result = $this->_cleanOld();
                 } else {
                     $result = true;
                 }
@@ -278,6 +275,45 @@ class Varien_Cache_Backend_Database extends Zend_Cache_Backend implements Zend_C
                 Zend_Cache::throwException('Invalid mode for clean() method');
                 break;
         }
+
+        return $result;
+    }
+
+    /**
+     * Clean old cache records and related cache tag records
+     *
+     * @return boolean true if no problem
+     */
+    protected function _cleanOld()
+    {
+        $time = time();
+        $adapter = $this->_getAdapter();
+
+        // get all expired cache records
+        $select = $adapter->select()
+            ->from($this->_getDataTable(), 'id')
+            ->where('expire_time>?', 0)
+            ->where('expire_time<=?', $time);
+        $stm = $adapter->query($select);
+
+        // delete attached cache tags
+        $ids = array();
+        while (($row = $stm->fetch()) == true) {
+            $ids[] = $row['id'];
+            if (count($ids) > 100) {
+                $adapter->delete($this->_getTagsTable(), array('cache_id IN (?)' => $ids));
+                $ids = array();
+            }
+        }
+        if (!empty($ids)) {
+            $adapter->delete($this->_getTagsTable(), array('cache_id IN (?)' => $ids));
+        }
+
+        // delete actual cache records
+        $result = $adapter->delete($this->_getDataTable(), array(
+            'expire_time>?' => 0,
+            'expire_time<=?' => $time
+        ));
 
         return $result;
     }
