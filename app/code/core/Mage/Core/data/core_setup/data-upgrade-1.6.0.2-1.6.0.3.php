@@ -56,72 +56,54 @@ $select = $installer->getConnection()->select()
     ->from($installer->getTable('core/config_data'))
     ->where('path IN (?)', array_keys($configValuesMap))
     ->order(array(
-        new Zend_Db_Expr("scope = 'store' DESC, scope = 'website' DESC, scope = 'default' DESC")
+        new Zend_Db_Expr("FIELD(`scope`, 'stores', 'websites', 'default')")
     ));
 
 $configs = $installer->getConnection()->fetchAll($select);
 
-$templateMap = array();
+$usedTemplates = array();
+
 foreach ($configs as $config) {
-
-    if (is_numeric($config['value'])) {
-
-        if (!isset($templateMap[$config['value']])) {
-            $templateMap[$config['value']] = array();
-        }
-        $templateMap[$config['value']][] = $config;
+    if (!is_numeric($config['value'])) {
+        continue;
     }
-}
 
-$select = $installer->getConnection()->select()
-    ->from($installer->getTable('core/email_template'));
+    // Mapping Stores
+    $stores = array();
+    if ($config['scope'] === 'stores') {
+        $stores[] = $config['scope_id'];
+    } else if ($config['scope'] === 'websites') {
+        $website = Mage::getModel('core/website')->load($config['scope_id']);
+        foreach ($website->getGroups() as $group) {
+            foreach ($group->getStores() as $store) {
+                $stores[] = $store->getId();
+            }
+        }
+    } else if ($config['scope'] === 'default') {
+        $stores[] = Mage_Core_Model_App::ADMIN_STORE_ID;
+    }
 
-$templates = $installer->getConnection()->fetchAll($select);
+    // Save Template
+    foreach ($stores as $store) {
+        try {
+            $model = Mage::getModel('core/email_template')->load($config['value']);
 
-foreach ($templates as $template) {
-
-    if (isset($templateMap[$template['template_id']])) {
-
-        $i = 0;
-        foreach ($templateMap[$template['template_id']] as $config) {
-
-            $template['template_code'] = $configValuesMap[$config['path']];
-            if ($i > 0) {
-
-                // duplicate template
-                $template['template_id'] = null;
+            $storeIds = $model->getStoreId();
+            if (in_array($config['value'], $usedTemplates)) {
+                $model->setTemplateId(null);
+                $storeIds = array();
             }
 
-            $stores = array();
-            if ($config['scope'] === 'stores') {
-                $stores[] = $config['scope_id'];
-            } else if ($config['scope'] === 'websites') {
-                $website = Mage::getModel('core/website')->load($config['scope_id']);
-                foreach ($website->getGroups() as $group) {
-                    foreach ($group->getStores() as $store) {
-                        $stores[] = $store->getId();
-                    }
-                }
-            } else if ($config['scope'] === 'default') {
-                $stores[] = Mage_Core_Model_App::ADMIN_STORE_ID;
-            }
+            $code = isset($configValuesMap[$config['path']]) ? $configValuesMap[$config['path']] : 'foobar';
+            $model->setTemplateCode($code);
 
-            foreach ($stores as $store) {
-                try {
-                    $model = Mage::getModel('core/email_template')->load($template['template_id']);
-                    $storeId = $model->getStoreId();
-
-                    $template['stores'][] = $store;
-
-                    $model->setData($template);
-                    $model->save();
-
-                } catch (Mage_Core_Exception $e) {
-                    // ignore conflicts, handled by order of scope in SQL select
-                }
-            }
-
-            $i++;
+            $storeIds[] = $store;
+            $model->setStores($storeIds);
+            $model->save();
+        } catch (Mage_Core_Exception $e) {
+            // ignore conflicts, handled by order of scope in SQL select
         }
     }
+
+    $usedTemplates[] = $config['value'];
 }
