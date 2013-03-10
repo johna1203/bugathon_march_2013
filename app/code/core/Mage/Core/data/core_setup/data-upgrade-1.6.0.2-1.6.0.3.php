@@ -87,6 +87,11 @@ foreach ($configs as $config) {
     foreach ($stores as $store) {
         try {
             $model = Mage::getModel('core/email_template')->load($config['value']);
+            
+            if (!$model->getId()) {
+                // skip non-existing templates
+                continue;
+            }
 
             $storeIds = $model->getStoreId();
             if (in_array($config['value'], $usedTemplates)) {
