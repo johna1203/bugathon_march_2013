@@ -13,7 +13,7 @@
  * @group module:Mage_Catalog
  * @magentoDataFixture Mage/Catalog/_files/products_sort_attributes.php
  */
-class Mage_Catalog_Model_Resource_Product_CollectionTest extends PHPUnit_Framework_TestCase
+class Mage_Catalog_Model_Resource_Product_FlatCollectionTest extends PHPUnit_Framework_TestCase
 {
     /**
      * @var Mage_Catalog_Model_Resource_Product_Collection
@@ -21,18 +21,24 @@ class Mage_Catalog_Model_Resource_Product_CollectionTest extends PHPUnit_Framewo
     protected $_collection;
 
     /**
-     * This method is called before a test is executed.
+     * Rebuild the flat the fixture products
      */
     protected function setUp()
     {
+        /** @var $process Mage_Catalog_Model_Product_Indexer_Flat */
+        $process = Mage::getSingleton('index/indexer')->allowTableChanges()->getProcessByCode('catalog_product_flat');
+        $process->reindexAll();
+        $process->setStatus(Mage_Index_Model_Process::STATUS_PENDING)->save();
+        Mage::app()->getStore()->setConfig(Mage_Catalog_Helper_Product_Flat::XML_PATH_USE_PRODUCT_FLAT, 1);
         $this->_collection = new Mage_Catalog_Model_Resource_Product_Collection;
     }
 
     /**
-     * Clean up collection instance after every test
+     * Clean up collection instance after every test and revert indexer setting again
      */
     protected function tearDown()
     {
+        Mage::getSingleton('index/indexer')->disallowTableChanges();
         $this->_collection->clear();
         $this->_collection = null;
     }
@@ -90,7 +96,6 @@ class Mage_Catalog_Model_Resource_Product_CollectionTest extends PHPUnit_Framewo
                 ->setOrder($attributeCode, 'DESC')
                 ->addAttributeToSelect($attributeCode)
                 ->load();
-
         $first = $this->_collection->getFirstItem()->$accessor($attributeCode);
         $last  = $this->_collection->getLastItem()->$accessor($attributeCode);
         $this->assertLessThan($first, $last, "Sorting by custom attribute '$attributeCode' (DESC)");
