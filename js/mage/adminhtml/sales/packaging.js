@@ -721,7 +721,7 @@ Packaging.prototype = {
                 var value = this.itemQtyCallback(itemId);
                 qtyValue = ((typeof value == 'string') && (value.length == 0)) ? 0 : parseFloat(value);
                 if (isNaN(qtyValue) || qtyValue < 0) {
-                    qtyValue = 1;
+                    qtyValue = 0;
                 }
                 qtyValue = this.validateItemQty(itemId, qtyValue);
                 qty.value = qtyValue;
@@ -729,7 +729,7 @@ Packaging.prototype = {
                 var value = item.select('[name="qty"]')[0].value;
                 qtyValue = ((typeof value == 'string') && (value.length == 0)) ? 0 : parseFloat(value);
                 if (isNaN(qtyValue) || qtyValue < 0) {
-                    qtyValue = 1;
+                    qtyValue = 0;
                 }
             }
             if (qtyValue == 0) {
