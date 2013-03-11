@@ -62,6 +62,13 @@ abstract class Mage_Shell_Abstract
     protected $_appType     = 'store';
 
     /**
+     * Initialize application options
+     *
+     * @var array
+     */
+    protected $_appOptions  = array();
+
+    /**
      * Input arguments
      *
      * @var array
@@ -76,7 +83,7 @@ abstract class Mage_Shell_Abstract
     {
         if ($this->_includeMage) {
             require_once $this->_getRootPath() . 'app' . DIRECTORY_SEPARATOR . 'Mage.php';
-            Mage::app($this->_appCode, $this->_appType);
+            Mage::app($this->_appCode, $this->_appType, $this->_appOptions);
         }
 
         $this->_applyPhpVariables();

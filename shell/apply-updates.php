@@ -30,6 +30,8 @@ class Mage_Shell_Updates extends Mage_Shell_Abstract
 {
     protected $_includeMage = true;
 
+    protected $_appOptions = array('global_ban_use_cache' => true);
+
     /**
      * Run script
      *
@@ -42,19 +44,16 @@ class Mage_Shell_Updates extends Mage_Shell_Abstract
 
         } else {
 
-            // re-initialize Admin store
-            Mage::app()->getCacheInstance()->cleanType(Mage_Core_Model_Config::CACHE_TAG);
-            Mage::app()->init('admin', 'store');
-
-            // schema updates
+            // apply updates
             Mage_Core_Model_Resource_Setup::applyAllUpdates();
-
-            // flush cache for schema changes
-            Mage::app()->cleanCache();
-            Mage::app()->getCacheInstance()->flush();
-
-            // data updates
             Mage_Core_Model_Resource_Setup::applyAllDataUpdates();
+
+            // now enable caching and save
+            Mage::getConfig()->getOptions()->setData('global_ban_use_cache', false);
+
+             // re-init cache
+            Mage::app()->baseInit(array());
+            Mage::getConfig()->loadModules()->loadDb()->saveCache();
 
             echo "All updates successfully applied\n";
         }
