@@ -32,7 +32,7 @@
  * @author     Magento Core Team <core@magentocommerce.com>
  */
 class Mage_Catalog_Model_Product_Attribute_Source_Countryofmanufacture
-    extends Mage_Eav_Model_Entity_Attribute_Source_Abstract
+    extends Mage_Catalog_Model_Product_Attribute_Source_Abstract
 {
     /**
      * Get list of all available countries
@@ -52,5 +52,68 @@ class Mage_Catalog_Model_Product_Attribute_Source_Countryofmanufacture
             }
         }
         return $options;
+    }
+
+    /**
+     * Retrieve Column(s) for Flat Tables
+     *
+     * @return array
+     */
+    public function getFlatColums()
+    {
+        $columns = array();
+        $attributeCode = $this->getAttribute()->getAttributeCode();
+
+        if (Mage::helper('core')->useDbCompatibleMode()) {
+            $columns[$attributeCode] = array(
+                'type'      => 'varchar(255)',
+                'unsigned'  => false,
+                'is_null'   => true,
+                'default'   => null,
+                'extra'     => null
+            );
+        } else {
+            $columns[$attributeCode] = array(
+                'type'      => Varien_Db_Ddl_Table::TYPE_TEXT,
+                'length'    => '255',
+                'unsigned'  => false,
+                'nullable'   => true,
+                'default'   => null,
+                'extra'     => null,
+                'comment'   => $attributeCode . ' column'
+            );
+        }
+
+        return $columns;
+    }
+
+    /**
+     * Retrieve Indexes for Flat Tables
+     *
+     * @return array
+     */
+    public function getFlatIndexes()
+    {
+        $indexes = array();
+
+        $index = sprintf('IDX_%s', strtoupper($this->getAttribute()->getAttributeCode()));
+        $indexes[$index] = array(
+            'type'      => 'index',
+            'fields'    => array($this->getAttribute()->getAttributeCode())
+        );
+
+        return $indexes;
+    }
+
+    /**
+     * Retrieve Select For Flat Attribute update
+     *
+     * @param int $store
+     * @return Varien_Db_Select|null
+     */
+    public function getFlatUpdateSelect($store)
+    {
+        return Mage::getResourceModel('eav/entity_attribute')
+            ->getFlatUpdateSelect($this->getAttribute(), $store);
     }
 }
