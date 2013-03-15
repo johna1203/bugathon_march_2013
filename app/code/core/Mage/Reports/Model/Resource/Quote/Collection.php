@@ -119,6 +119,7 @@ class Mage_Reports_Model_Resource_Quote_Collection extends Mage_Sales_Model_Reso
                 array(
                    'orders' => new Zend_Db_Expr('COUNT(1)'),
                    'product_id'))
+            ->where('oi.qty_ordered > oi.qty_canceled')
             ->group('oi.product_id');
 
         $this->getSelect()
