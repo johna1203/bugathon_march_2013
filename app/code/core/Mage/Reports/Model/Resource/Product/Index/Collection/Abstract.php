@@ -162,4 +162,18 @@ abstract class Mage_Reports_Model_Resource_Product_Index_Collection_Abstract
         $this->getSelect()->where('idx_table.product_id NOT IN(?)', $productIds);
         return $this;
     }
+
+    /**
+     * @param int|null $storeId
+     * @return Mage_Reports_Model_Resource_Product_Index_Collection_Abstract
+     */
+    public function addStoreFilter($storeId=null)
+    {
+        if (null === $storeId) {
+            $storeId = $this->getStoreId();
+        }
+        $this->_joinIdxTable();
+        $this->getSelect()->where('idx_table.store_id = ?', $storeId);
+        return $this;
+    }
 }

@@ -118,7 +118,8 @@ abstract class Mage_Reports_Block_Product_Abstract extends Mage_Catalog_Block_Pr
 
             $this->_collection = $this->_getModel()
                 ->getCollection()
-                ->addAttributeToSelect($attributes);
+                ->addAttributeToSelect($attributes)
+                ->addStoreFilter();
 
                 if ($this->getCustomerId()) {
                     $this->_collection->setCustomerId($this->getCustomerId());
