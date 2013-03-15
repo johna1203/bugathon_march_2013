@@ -125,6 +125,11 @@ class Mage_Authorizenet_Directpost_PaymentController extends Mage_Core_Controlle
             $cancelOrder = empty($redirectParams['x_invoice_num']);
             $this->_returnCustomerQuote($cancelOrder, $redirectParams['error_msg']);
         }
+
+        if (strpos($redirectParams['controller_action_name'], 'sales_order_') !== false) {
+            unset($redirectParams['controller_action_name']);
+        }
+
         $block = $this->_getIframeBlock()->setParams(array_merge($params, $redirectParams));
         $this->getResponse()->setBody($block->toHtml());
     }
