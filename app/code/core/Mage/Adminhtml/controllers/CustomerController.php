@@ -511,10 +511,11 @@ class Mage_Adminhtml_CustomerController extends Mage_Adminhtml_Controller_Action
     public function viewCartAction()
     {
         $this->_initCustomer();
-        $layout = $this->loadLayout()
+        $website_id = (int)$this->getRequest()->getParam('website_id');
+        $this->loadLayout()
             ->getLayout()
             ->getBlock('admin.customer.view.cart')
-            ->setWebsiteId();
+            ->setWebsiteId($website_id);
         $this->renderLayout();
     }
 
